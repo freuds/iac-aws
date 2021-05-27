@@ -1,6 +1,6 @@
 terraform {
   backend "remote" {
-    organization = "phenix"
+    organization = "fred-iac-test"
   }
   required_version = ">= 0.13.0"
 }

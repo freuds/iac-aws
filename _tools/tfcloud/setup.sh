@@ -58,7 +58,6 @@ fi
 
 # Set up some variables we'll need
 HOST="${1:-app.terraform.io}"
-# BACKEND_TF=$(dirname ${BASH_SOURCE[0]})/../backend.tf
 # PROVIDER_TF=$(dirname ${BASH_SOURCE[0]})/../provider.tf
 TERRAFORM_VERSION=$(terraform version -json | jq -r '.terraform_version')
 
@@ -128,23 +127,41 @@ if [[ ! -f $CREDENTIALS_FILE || $TOKEN == null ]]; then
 fi
 
 # Create a Terraform Cloud organization
-echo
-echo "Check if organization already exists ..."
-org_exist=$(check_exist_organization)
-sleep 1
-if [[ $org_exist == 0 ]]; then
+# echo
+# echo "Check if organization already exists ..."
+# org_exist=$(check_exist_organization)
+# sleep 1
+# if [[ $org_exist == 0 ]]; then
 
-  echo "Creating an organization ..."
-  org_create=$(create_organization)
-  if [[ $org_create != 0 ]]; then
-    success "Ok. $org_create created."
-  fi
+#   echo "Creating an organization ..."
+#   org_create=$(create_organization)
+#   if [[ $org_create != 0 ]]; then
+#     success "Ok. $org_create created."
+#   fi
 
-else
-  info "Found existing organization : ${org_exist}"
-fi
+# else
+#   info "Found existing organization : ${org_exist}"
+# fi
 
 # TODO : update organizations name for each _backend.tf file
+BACKEND_TF_LIST=$(find . -type f -name "_backend.tf")
+for BACKEND_TF in "${BACKEND_TF_LIST[@]}"
+do
+  if ! grep "organization = \"${ORGANIZATION_NAME}\"" $BACKEND_TF 2>/dev/null ; then
+    info "Need to change file: $BACKEND_TF"
+    # We don't sed -i because MacOS's sed has problems with it.
+    TEMP=$(mktemp)
+    cat $BACKEND_TF |
+      sed -e "s/.* organization = \".*\"/    organization = \"${ORGANIZATION_NAME}\"/" \
+        > $TEMP
+    mv $TEMP $BACKEND_TF
+    terraform fmt $BACKEND_TF
+    git commit -v -a -s --no-edit --amend
+  fi
+done
+# TODO 
+# 'gcan!'='git commit -v -a --no-edit --amend'
+# 'gcans!'='git commit -v -a -s --no-edit --amend'
 
 # Workspaces creation
 # Based on each .terraform-config file present in service/env/region folders
