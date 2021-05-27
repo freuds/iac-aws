@@ -1,0 +1,3 @@
+---
+apt_specific_packages:
+  - mysql-client-core-5.7

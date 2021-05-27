@@ -1,0 +1,69 @@
+---
+- name: dehydrated directories
+  file: 
+    path: '{{ item }}'
+    state: directory
+  with_items:
+    - /usr/local/src/dehydrated
+    - /etc/dehydrated/hooks
+    - /etc/dehydrated/accounts
+    - /etc/dehydrated/certs
+
+- name: dehydrated dependencies
+  apt: 
+    name: ["openssl", "curl", "python3", "python3-boto3", "dnsutils"]
+    state: present
+
+- name: dehydrated clone repository
+  git:
+    repo: '{{ dehydrated_repository_url }}'
+    dest: /usr/local/src/dehydrated
+
+- name: dehydrated install
+  file: 
+    src: /usr/local/src/dehydrated/dehydrated
+    dest: /usr/local/bin/dehydrated
+    state: link
+
+- name: dehydrated config
+  template: 
+    src: config.j2
+    dest: /etc/dehydrated/config
+
+- name: install dehydrated route53 dns hook
+  template:
+    src: hook.{{ item }}.j2
+    dest: /etc/dehydrated/hooks/{{ item }}
+    mode: 755
+  with_items:
+    - dns_route53.py
+  when: dehydrated_hook_config.dns_route53.enabled
+
+- name: install dehydrated google dns hook
+  template:
+    src: hook.{{ item }}.j2
+    dest: /etc/dehydrated/hooks/{{ item }}
+    mode: 755
+  with_items:
+    - dns_google.sh
+  when: dehydrated_hook_config.dns_google.enabled
+
+- name: make sure gomplates directory exists
+  file:
+    path: "{{ dehydrated_gomplates_path }}"
+    state: directory
+
+- name: dehydrated domains.txt
+  template:
+    src: domains.txt.j2
+    dest: '{{ dehydrated_gomplates_path }}/domains.txt'
+
+- name: setup dehydrated cron job in /etc/cron.d
+  cron:
+    name: dehydrated crontab
+    weekday: '7'
+    minute: '0'
+    hour: '12'
+    user: root
+    job: "/usr/local/bin/dehydrated -c -g > /var/log/dehydrated.log 2>&1"
+    cron_file: dehydrated

@@ -1,0 +1,18 @@
+---
+- name: authorized-keys scripts
+  copy: src={{ item }} dest=/opt/{{ item }} mode=755
+  with_items:
+    - authorized_keys_command.sh
+    - import_users.sh
+
+- name: authorized-keys sshd config
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    insertafter: "^#AuthorizedKeysFile"
+    line: "{{ item }}"
+  with_items:
+    - "AuthorizedKeysCommand /opt/authorized_keys_command.sh"
+    - "AuthorizedKeysCommandUser nobody"
+
+- name: authorized-keys cron
+  cron: name=import-users user=root job="/opt/import_users.sh >> /tmp/import_users.log 2>&1" minute="*/10"

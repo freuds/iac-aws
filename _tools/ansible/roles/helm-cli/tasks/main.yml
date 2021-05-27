@@ -1,0 +1,8 @@
+- name: Donwload Helm cli
+  get_url:
+    url: '{{ helm_binary_download_url }}'
+    dest: '{{ helm_binary_install_path }}'
+    mode: 0700
+
+- name: Install Helm cli
+  shell: '{{ helm_binary_install_path }}'

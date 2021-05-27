@@ -1,0 +1,10 @@
+# HAProxy stats
+# {{ ansible_managed }}
+listen stats
+    bind {{ haproxy_stats_address | default ('*')}}:{{ haproxy_stats_port | default ('1936')}}
+    mode http
+    stats enable
+    stats hide-version
+    stats realm Haproxy\ Statistics
+    stats uri /
+    stats auth {{ haproxy_stats_user | default('admin')}}:{{ haproxy_stats_pwd | default ('admin')}}

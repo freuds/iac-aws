@@ -1,0 +1,9 @@
+{
+    "organization_name": "fred-iac-test",
+    "admin_email": "frederic.willien@revolve.team",
+    "env": {
+        "env1": "qa",
+        "env2": "staging",
+        "env3": "prod"
+    }
+}

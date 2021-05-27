@@ -1,0 +1,7 @@
+{
+  "template": "ubuntu-bionic",
+  "role": "server",
+  "service": "haproxy",
+  "inventory_groups": "haproxy",
+  "playbook_file": "../../_tools/ansible/playbooks/haproxy.yml"
+}

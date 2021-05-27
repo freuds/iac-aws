@@ -1,0 +1,7 @@
+- hosts: k3s
+  become: true
+  roles:
+#    - apt
+#    - k3s-cluster
+    - k3s-ingress
+    #- k3s-mysql

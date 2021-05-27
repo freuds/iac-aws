@@ -1,0 +1,3 @@
+---
+helm_binary_download_url: https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+helm_binary_install_path: /tmp/get_helm.sh

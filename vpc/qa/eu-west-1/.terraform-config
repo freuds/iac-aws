@@ -1,0 +1,3 @@
+workspaces {
+    name = "vpc-qa-eu-west-1"
+}

@@ -1,0 +1,55 @@
+module "vpc" {
+  source                  = "git@github.com:born2scale/terraform-aws-vpc.git"
+  env                     = var.env
+  region                  = var.region
+  cidr_block              = var.cidr_block
+  subnet_priv_bits        = var.subnet_priv_bits
+  subnet_pub_bits         = var.subnet_pub_bits
+  subnet_pub_offset       = var.subnet_pub_offset
+  internal_domain_name    = var.internal_domain_name
+  external_domain_name    = var.external_domain_name
+  eks_public_subnet_tags  = var.eks_public_subnet_tags
+  eks_private_subnet_tags = var.eks_private_subnet_tags
+}
+
+data "template_file" "extra-userdata" {
+  template = file("${path.cwd}/../../_terraform/init.tpl")
+
+  vars = {
+    db_script      = data.template_file.db-import.rendered
+    id_phenix_pub  = var.id_phenix_pub
+    id_phenix_priv = var.id_phenix_priv
+
+    datadog_api_key       = var.DATADOG_API_KEY
+    datadog_tag_env       = var.env
+    datadog_agent_enabled = var.datadog_agent_enabled
+  }
+}
+
+data "template_file" "db-import" {
+  template = file("${path.cwd}/../../_terraform/db-import.sh.tpl")
+
+  vars = {
+    db_host     = var.db_host
+    db_user     = var.db_user
+    db_password = var.db_password
+    db_name     = var.db_name
+  }
+}
+
+module "bastion" {
+  source                     = "git@github.com:born2scale/terraform-aws-bastion.git"
+  region                     = var.region
+  vpc_id                     = module.vpc.vpc_id
+  ami                        = var.bastion_ami
+  instance_type              = var.bastion_instance_type
+  asg_desired_capacity       = var.bastion_asg_desired_capacity
+  asg_min_size               = var.bastion_asg_min_size
+  asg_max_size               = var.bastion_asg_max_size
+  aws_route53_zone_public_id = module.vpc.public_host_zone
+  env                        = var.env
+  subnet_ids                 = module.vpc.public_subnets
+  s3_vault_bucket            = data.terraform_remote_state.baseline.outputs.s3-vault-bucket
+  root_keypair               = data.terraform_remote_state.baseline.outputs.root_keypair
+  extra_userdata             = data.template_file.extra-userdata.rendered
+}

@@ -1,0 +1,10 @@
+---
+- name: Install Helm repo for HAproxy
+  shell: >
+    helm --kubeconfig={{ kubeconfig }} repo add \
+    {{ helm_repo_haproxy_name }} {{ helm_repo_haproxy_url }}
+
+- name: Install helm chart Haproxy Ingress
+  shell: >
+    helm --kubeconfig={{ kubeconfig }} upgrade haproxy \
+    {{ helm_repo_haproxy_name }}/{{ helm_haproxy_chart_name }} --install

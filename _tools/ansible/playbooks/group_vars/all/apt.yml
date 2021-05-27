@@ -1,0 +1,6 @@
+---
+apt_common_packages:
+  - sysstat
+  - jq
+  - git
+  - dnsutils
