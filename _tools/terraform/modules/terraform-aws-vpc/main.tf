@@ -32,21 +32,21 @@ resource "aws_subnet" "public" {
   ))
 }
 
-resource "aws_elasticache_subnet_group" "ec-subnet-group" {
-  name        = "${var.env}-ec-subnet-group"
-  description = "Elastic Cache Subnet Group"
-  subnet_ids  = [for o in aws_subnet.private : o.id]
-}
+# resource "aws_elasticache_subnet_group" "ec-subnet-group" {
+#   name        = "${var.env}-ec-subnet-group"
+#   description = "Elastic Cache Subnet Group"
+#   subnet_ids  = [for o in aws_subnet.private : o.id]
+# }
 
-resource "aws_db_subnet_group" "db-subnet-group" {
-  name        = "${var.env}-db-subnet-group"
-  description = "RDS DB Subnet Group"
-  subnet_ids  = [for o in aws_subnet.private : o.id]
+# resource "aws_db_subnet_group" "db-subnet-group" {
+#   name        = "${var.env}-db-subnet-group"
+#   description = "RDS DB Subnet Group"
+#   subnet_ids  = [for o in aws_subnet.private : o.id]
 
-  tags = {
-    Name = "${var.env}-db-subnet-group"
-  }
-}
+#   tags = {
+#     Name = "${var.env}-db-subnet-group"
+#   }
+# }
 
 # Ressources for Publics subnets
 resource "aws_internet_gateway" "gw" {

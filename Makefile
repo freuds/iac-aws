@@ -16,6 +16,5 @@ cyan = tput setaf 6; echo $1; tput sgr0;
 help:	## Show this help.
 	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'
 
-
 tfinit:   ## Create Organisation and workspace on TF Cloud
-	@_tools/tfcloud/setup.sh
+	@_tools/scripts/tfcloud.sh

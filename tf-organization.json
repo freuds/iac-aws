@@ -1,5 +1,5 @@
 {
-    "organization_name": "fred-iac-test",
+    "organization_name": "fred-iac",
     "admin_email": "frederic.willien@revolve.team",
     "env": {
         "env1": "qa",

@@ -1,6 +1,4 @@
-variable "env" {
-
-}
+variable "env" {}
 
 variable "region" {
   default = "eu-west-1"
@@ -112,11 +110,11 @@ variable "eks_private_subnet_tags" {
   default = {}
 }
 
-variable "DATADOG_API_KEY" {
-  description = "Datadog API KEY is defined on TFCLOUD environment variables"
-}
+# variable "DATADOG_API_KEY" {
+#   description = "Datadog API KEY is defined on TFCLOUD environment variables"
+# }
 
-variable "datadog_agent_enabled" {
-  description = "Enable or not the datadog agent"
-  default     = false
-}
+# variable "datadog_agent_enabled" {
+#   description = "Enable or not the datadog agent"
+#   default     = false
+# }
