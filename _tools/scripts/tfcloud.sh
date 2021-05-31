@@ -92,7 +92,7 @@ REQUEST_BODY
       fail "An unknown error occurred: ${response}"
     fi
   elif [[ $(echo $response | jq -r '.data.type') == "organizations" ]]; then
-    success "Create $(echo $response | jq -r '.data.attributes.name') organizations"
+    success "Organization $(echo $response | jq -r '.data.attributes.name') created !!"
   fi
 }
 
@@ -125,7 +125,7 @@ REQUEST_BODY
       fail "An unknown error occurred: ${response}"
     fi
   elif [[ $(echo $response | jq -r '.data.type') == "workspaces" ]]; then
-    success "Create $(echo $response | jq -r '.data.attributes.name') workspace"
+    success "Workspace $(echo $response | jq -r '.data.attributes.name') created !"
   fi
 }
 
@@ -151,7 +151,7 @@ echo
 BACKEND_TF_LIST=$(find . -type f -name "_backend.tf")
 for BACKEND_TF in "${BACKEND_TF_LIST[@]}"
 do
-  if ! grep "organization = \"${ORGANIZATION_NAME}\"" $BACKEND_TF 2>/dev/null ; then
+  if ! grep "organization = \"${ORGANIZATION_NAME}\"" $BACKEND_TF 2>&1 >/dev/null ; then
     info "Need to change file: $BACKEND_TF"
     # We don't sed -i because MacOS's sed has problems with it.
     TEMP=$(mktemp)
@@ -182,7 +182,7 @@ do
   WORKSPACE_NAME="${_SERVICE}-${_ENV}-${_REGION}"
 
   # check if .terraform-config is existing and correct
-  if ! grep "name = \"${WORKSPACE_NAME}\"" $FILENAME 2>/dev/null ; then
+  if ! grep "name = \"${WORKSPACE_NAME}\"" $FILENAME 2>&1 >/dev/null ; then
     info "Need to change file: $FILENAME"
     TEMP=$(mktemp)
     cat $FILENAME |
@@ -191,7 +191,7 @@ do
     mv $TEMP $FILENAME
   fi
 
-  echo "Create workspace ${WORKSPACE_NAME} if needed ..."
+  echo "Creating workspace if needed ..."
   create_workspace ${WORKSPACE_NAME}
 
 done
