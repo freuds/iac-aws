@@ -21,9 +21,11 @@ resource "aws_subnet" "public" {
   availability_zone       = each.key
   map_public_ip_on_launch = "true"
   tags = merge(
-  var.eks_public_subnet_tags,
-  map("Name", "${var.env}-pub-subnet-${trimprefix(each.key, var.region)}"
-  ))
+    {
+      "Name" = format("%s-pub-subnet-%s", var.env, trimprefix(each.key, var.region))
+    },
+    var.eks_public_subnet_tags,
+  )
 }
 
 ##

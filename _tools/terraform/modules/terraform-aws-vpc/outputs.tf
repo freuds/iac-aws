@@ -1,10 +1,10 @@
-# output "vpc_id" {
-#   value = aws_vpc.main.id
-# }
+output "vpc_id" {
+  value = aws_vpc.main.id
+}
 
-# output "azs" {
-#   value = var.azs
-# }
+output "azs" {
+  value = var.azs
+}
 
 # output "vpc_dns_srv_ip" {
 #   value = cidrhost(var.cidr_block, 2)
@@ -22,21 +22,21 @@
 #   value = aws_route53_zone.public.zone_id
 # }
 
-# output "private_domain_name" {
-#   value = var.internal_domain_name
-# }
+output "private_domain_name" {
+  value = var.internal_domain_name
+}
 
-# output "public_domain_name" {
-#   value = var.external_domain_name
-# }
+output "public_domain_name" {
+  value = var.external_domain_name
+}
 
-# output "public_subnets" {
-#   value = [for s in aws_subnet.public : s.id]
-# }
+output "public_subnets" {
+  value = [for s in aws_subnet.public : s.id]
+}
 
-# output "public_subnets_cidr" {
-#   value = [for b in aws_subnet.public : b.cidr_block]
-# }
+output "public_subnets_cidr" {
+  value = [for b in aws_subnet.public : b.cidr_block]
+}
 
 # output "private_subnets" {
 #   value = [for s in aws_subnet.private: s.id]

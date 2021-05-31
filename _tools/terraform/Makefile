@@ -36,37 +36,37 @@ help:	## Show this help.
 init:	## Make terraform init
 	@$(call yellow, "Init Terraform")
 	@make symlinks
-	terraform init -reconfigure -backend-config=.terraform-config
+	@terraform init -reconfigure -backend-config=.terraform-config
 
 plan:	## Make terraform plan
 	@$(call cyan, "Plan Terraform")
-	terraform plan
+	@terraform plan
 
 apply:	## Make terraform apply
 	@$(call green, "Apply Terraform")
-	terraform apply
+	@terraform apply
 
 destroy:  ## Plan terraform destroy
 	@$(call red, "Plan Destroy Terraform")
-	terraform plan -destroy
+	@terraform plan -destroy
 
 mdestroy: ## Make terraform destroy
 	@$(call red, "Destroy Terraform")
-	terraform plan -destroy -out=destroy.tfplan
-	terraform apply destroy.tfplan
+	@terraform plan -destroy
+	@terraform apply -destroy
 
 output:	## Make terraform output
 	@$(call cyan, "Output Terraform")
-	terraform output
+	@terraform output
 
-valid:	## Make terraform validate
+validate:	## Make terraform validate
 	@$(call cyan, "Validate Terraform")
-	terraform validate
+	@terraform validate
 
 list:	## Make terraform state list
 	@$(call cyan, "List Terraform state")
-	@make mklink
-	terraform state list
+	@make symlinks
+	@terraform state list
 
 install:  ## Make tfenv install
 	@$(call cyan, "Terraform Install")
@@ -78,7 +78,7 @@ use:      ## Make tfenv use
 
 version:  ## Show terraform version
 	@$(call cyan, "Terraform version")
-	terraform version
+	@terraform version
 
 cleanlinks:
 	@$(call cyan, "Clean links")

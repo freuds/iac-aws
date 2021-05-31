@@ -1,6 +1,6 @@
 cidr_block            = "10.152.0.0/16"
 env                   = "qa"
-region                = "eu-west-1"
+region                = "us-east-1"
 subnet_priv_bits      = 4
 subnet_pub_bits       = 6
 subnet_pub_offset     = 32

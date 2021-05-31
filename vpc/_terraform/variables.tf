@@ -1,6 +1,10 @@
-variable "env" {}
+variable "env" {
+  type = string
+  default = ""
+}
 
 variable "region" {
+  type = string
   default = "eu-west-1"
 }
 
@@ -11,10 +15,16 @@ variable "subnet_pub_offset" {}
 variable "internal_domain_name" {}
 variable "external_domain_name" {}
 
-variable "bastion_ami" {}
+variable "eks_public_subnet_tags" {
+  default = {}
+}
 
-variable "organization" {
-  default = "phenix"
+variable "eks_private_subnet_tags" {
+  default = {}
+}
+
+variable "bastion_ami" {
+  default = "ami-2547a34c"
 }
 
 variable "bastion_instance_type" {
@@ -31,21 +41,6 @@ variable "bastion_asg_min_size" {
 variable "bastion_asg_max_size" {
   type    = number
   default = 1
-}
-
-variable "db_host" {
-  type    = string
-  default = "appREMOTE@dev.wearephenix.com"
-}
-
-variable "db_user" {
-  type    = string
-  default = "root"
-}
-
-variable "db_password" {
-  type    = string
-  default = "EyGHvfp85s4pm98"
 }
 
 variable "db_name" {
@@ -102,13 +97,6 @@ EIx2TrShNIHNqSRPYvj20ubXl74BoWBw1oZXVsEa7Z8aN3OvoX4JIjyLNziLEVFo4+HR0c
 EOF
 }
 
-variable "eks_public_subnet_tags" {
-  default = {}
-}
-
-variable "eks_private_subnet_tags" {
-  default = {}
-}
 
 # variable "DATADOG_API_KEY" {
 #   description = "Datadog API KEY is defined on TFCLOUD environment variables"
