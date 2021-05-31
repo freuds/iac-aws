@@ -197,6 +197,8 @@ do
 done
 
 # Commit all changes
+echo "Commit all changes ?"
+pause_for_confirmation
 git commit -v -a --no-edit --amend
 
 exit 0
