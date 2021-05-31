@@ -100,6 +100,7 @@ REQUEST_BODY
 create_workspace() {
   local result
   local response
+  local workdir
   response=$(curl https://$HOST/api/v2/organizations/${ORGANIZATION_NAME}/workspaces \
     --request POST \
     --silent \
@@ -112,6 +113,7 @@ create_workspace() {
       "attributes": {
         "name": "${WORKSPACE_NAME}",
         "terraform-version": "${TERRAFORM_VERSION}",
+        "working-directory": "${WORKING_DIRECTORY}",
         "description": "Workpace ${_ENV} for ${_SERVICE} on ${_REGION}"
       }
     }
@@ -163,9 +165,6 @@ do
   fi
 done
 
-divider
-echo
-
 # Workspaces creation
 # Based on each .terraform-config file present in service/env/region folders
 CONFIG_TF_LIST=$(find . -type f -name ".terraform-config")
@@ -180,6 +179,7 @@ do
   _ENV="${array[2]}"
   _REGION="${array[3]}"
   WORKSPACE_NAME="${_SERVICE}-${_ENV}-${_REGION}"
+  WORKING_DIRECTORY="${_SERVICE}/${_ENV}/${_REGION}"
 
   # check if .terraform-config is existing and correct
   if ! grep "name = \"${WORKSPACE_NAME}\"" $FILENAME 2>&1 >/dev/null ; then
@@ -192,7 +192,7 @@ do
   fi
 
   echo "Creating workspace if needed ..."
-  create_workspace ${WORKSPACE_NAME}
+  create_workspace ${WORKSPACE_NAME} ${WORKING_DIRECTORY}
 
 done
 

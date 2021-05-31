@@ -1,8 +1,21 @@
-default: help
 
 export PATH := $(PATH):/usr/local/bin
 
 SHELL:=/bin/bash -eu
+
+TAG ?= latest
+NAMESPACE ?= default
+VERSION ?= 0.1.0
+#VERSION ?= $$(git rev-parse HEAD)
+SERVICE_NAME ?= hugo
+
+# Get environment depends of current path
+ENVIRONMENT = $(shell basename $(realpath $(PWD)))
+# realpath of Makefile
+WORKDIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
+REPOSITORY ?= ${WORKDIR}charts
+CHART ?= ${WORKDIR}charts/${SERVICE_NAME}
+ARGUMENTS ?=
 
 # Colors
 grey = tput setaf 7; echo $1; tput sgr0;
@@ -13,6 +26,8 @@ blue = tput setaf 4; echo $1; tput sgr0;
 purple = tput setaf 5; echo $1; tput sgr0;
 cyan = tput setaf 6; echo $1; tput sgr0;
 
+default: help
+
 .PHONY: help
 
 help:	## Show this help.
@@ -20,63 +35,71 @@ help:	## Show this help.
 
 init:	## Make terraform init
 	@$(call yellow, "Init Terraform")
-	terraform init -reconfigure -backend-config=_backend.tfconfig ../terraform
+	@make symlinks
+	terraform init -reconfigure -backend-config=.terraform-config
 
 plan:	## Make terraform plan
 	@$(call cyan, "Plan Terraform")
-	terraform plan -var-file=variables.tfvars ../terraform
+	terraform plan
 
 apply:	## Make terraform apply
 	@$(call green, "Apply Terraform")
-	terraform apply -var-file=variables.tfvars ../terraform
+	terraform apply
 
-destroy:## Make terraform destroy
+destroy:  ## Plan terraform destroy
+	@$(call red, "Plan Destroy Terraform")
+	terraform plan -destroy
+
+mdestroy: ## Make terraform destroy
 	@$(call red, "Destroy Terraform")
-	terraform destroy -var-file=variables.tfvars ../terraform
-
-test:	## Make terraform test migration tool
-	@make mklink
-	@$(call purple, "Test migration tool")
-	terraform 0.12checklist -var-file=variables.tfvars ../terraform
-	@make clean
+	terraform plan -destroy -out=destroy.tfplan
+	terraform apply destroy.tfplan
 
 output:	## Make terraform output
-	@make mklink
 	@$(call cyan, "Output Terraform")
 	terraform output
-	@make clean
 
 valid:	## Make terraform validate
 	@$(call cyan, "Validate Terraform")
-	terraform validate -check-variables=true -var-file=variables.tfvars ../terraform
+	terraform validate
 
 list:	## Make terraform state list
 	@$(call cyan, "List Terraform state")
 	@make mklink
 	terraform state list
 
-fmt:	## Make terraform fmt
-	@$(call cyan, "Terraform linting")
-	terraform fmt ../terraform
-	terraform fmt .
-
-# install:	## Make tfenv install
-# 	@$(call cyan, "Terraform Install")
-# 	tfenv install
-
-use:		## Make tfenv use
+install:  ## Make tfenv install
 	@$(call cyan, "Terraform Install")
-	tfenv use
+	@tfenv install $(shell cat .terraform-version)
 
-clean:	## Make clean
-	if [ -f backend.tf ] ; then unlink backend.tf; fi
+use:      ## Make tfenv use
+	@$(call cyan, "Terraform Use version")
+	@tfenv use $(shell cat .terraform-version)
 
-mklink:
-	if [ ! -L _backend.tf ] ; then ln -s ../terraform/_backend.tf _backend.tf; fi
-	if [ ! -L _provider.tf ] ; then ln -s ../terraform/_provider.tf _provider.tf; fi
-	if [ ! -L main.tf ] ; then ln -s ../terraform/main.tf main.tf; fi
-	if [ ! -L outputs.tf ] ; then ln -s ../terraform/outputs.tf outputs.tf; fi
-	if [ ! -L remote-states.tf ] ; then ln -s ../terraform/remote-states.tf remote-states.tf; fi
-	if [ ! -L variables.tf ] ; then ln -s ../terraform/variables.tf variables.tf; fi
-# exception for init.tpl & others tpl files
+version:  ## Show terraform version
+	@$(call cyan, "Terraform version")
+	terraform version
 
+cleanlinks:
+	@$(call cyan, "Clean links")
+	@if [ -L _backend.tf ] ; then unlink _backend.tf; fi
+	@if [ -L _provider.tf ] ; then unlink _provider.tf; fi
+	@if [ -L main.tf ] ; then unlink main.tf; fi
+	@if [ -L outputs.tf ] ; then unlink outputs.tf; fi
+	@if [ -L variables.tf ] ; then unlink variables.tf; fi
+	@if [ -L .terraform-version ] ; then unlink .terraform-version; fi
+	@if [ -L remote-states.tf ] ; then unlink remote-states.tf; fi
+	@if [ -L init.tpl ] ; then unlink init.tpl; fi
+	@if [ -L irsa.tf ] ; then unlink irsa.tf; fi
+
+symlinks:
+	@$(call cyan, "Make links")
+	@if [ ! -L _backend.tf ] ; then ln -s ../../_terraform/_backend.tf _backend.tf; fi
+	@if [ ! -L _provider.tf ] ; then ln -s ../../_terraform/_provider.tf _provider.tf; fi
+	@if [ ! -L main.tf ] ; then ln -s ../../_terraform/main.tf main.tf; fi
+	@if [ ! -L outputs.tf ] ; then ln -s ../../_terraform/outputs.tf outputs.tf; fi
+	@if [ ! -L variables.tf ] ; then ln -s ../../_terraform/variables.tf variables.tf; fi
+	@if [ ! -L .terraform-version ] && [ ! -f .terraform-version ] ; then ln -s ../../_terraform/.terraform-version .terraform-version; fi
+	@if [ ! -L remote-states.tf ] && [ -f ../../_terraform/remote-states.tf ] ; then ln -s ../../_terraform/remote-states.tf remote-states.tf; fi
+	@if [ ! -L init.tpl ] && [ -f ../../_terraform/init.tpl ] ; then ln -s ../../_terraform/init.tpl init.tpl;fi
+	@if [ ! -L irsa.tf ] && [ -f ../../_terraform/irsa.tf ] ; then ln -s ../../_terraform/irsa.tf irsa.tf; fi

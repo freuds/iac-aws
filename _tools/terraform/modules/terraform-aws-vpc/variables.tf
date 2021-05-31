@@ -14,6 +14,13 @@ variable "azs" {
       "eu-west-1a",
       "eu-west-1b",
       "eu-west-1c"]
+    us-east-1 = [
+      "us-east-1a",
+      "us-east-1b",
+      "us-east-1c",
+      "us-east-1d",
+      "us-east-1e",
+      "us-east-1f"]
   }
 }
 
