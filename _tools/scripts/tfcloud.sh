@@ -150,7 +150,7 @@ divider
 echo
 
 # update organizations name for each _backend.tf file
-BACKEND_TF_LIST=$(find . -type f -name "_backend.tf")
+BACKEND_TF_LIST=$(find . -type f -name "backend.tf")
 for BACKEND_TF in "${BACKEND_TF_LIST[@]}"
 do
   if ! grep "organization = \"${ORGANIZATION_NAME}\"" $BACKEND_TF 2>&1 >/dev/null ; then
@@ -161,6 +161,7 @@ do
       sed -e "s/.* organization = \".*\"/    organization = \"${ORGANIZATION_NAME}\"/" \
         > $TEMP
     mv $TEMP $BACKEND_TF
+    chmod 0644 $BACKEND_TF
     terraform fmt $BACKEND_TF
   fi
 done
@@ -189,6 +190,7 @@ do
       sed -e "s/.*name = \".*\"/    name = \"${WORKSPACE_NAME}\"/" \
         > $TEMP
     mv $TEMP $FILENAME
+    chmod 0644 $FILENAME
   fi
 
   echo "Creating workspace if needed ..."
