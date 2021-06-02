@@ -10,6 +10,7 @@ module "vpc" {
   external_domain_name    = var.external_domain_name
   eks_public_subnet_tags  = var.eks_public_subnet_tags
   eks_private_subnet_tags = var.eks_private_subnet_tags
+  one_nat_gateway_per_az  = var.one_nat_gateway_per_az
 }
 
 # data "template_file" "extra-userdata" {

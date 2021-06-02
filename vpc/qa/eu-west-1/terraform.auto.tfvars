@@ -7,6 +7,8 @@ subnet_pub_offset     = 32
 internal_domain_name  = "qa.fred-iac.internal"
 external_domain_name  = "qa.fred-iac.freuds.me"
 
+one_nat_gateway_per_az = false
+
 # bastion_ami           = "ami-03d4ce558fcf83f5b"
 # datadog_agent_enabled = false
 # eks_private_subnet_tags = {
