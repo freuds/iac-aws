@@ -168,9 +168,8 @@ resource "aws_subnet" "private" {
 
 resource "aws_route" "private-default" {
   count                  = !var.one_nat_gateway_per_az ? length(lookup(var.azs, var.region)) : 0
-  # route_table_id         = aws_route_table.private[element(lookup(var.azs, var.region), count.index)].id
-    route_table_id         = aws_route_table.private.id
-destination_cidr_block = "0.0.0.0/0"
+  route_table_id         = aws_route_table.private.id
+  destination_cidr_block = "0.0.0.0/0"
   nat_gateway_id         = !var.one_nat_gateway_per_az ? aws_nat_gateway.single-natgw.0.id : aws_nat_gateway.multi-natgw.0.id
 }
 
