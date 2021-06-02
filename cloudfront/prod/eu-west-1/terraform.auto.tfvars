@@ -1,0 +1,5 @@
+env         = "prod"
+region      = "eu-west-1"
+price_class = "PriceClass_200"
+comment_OAI = "origin access identity for phenix-PROD"
+vpc_id      = "vpc-06fc00c564c6c70f6"

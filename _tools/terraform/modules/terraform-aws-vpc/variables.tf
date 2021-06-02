@@ -1,5 +1,13 @@
-variable "region" {}
-variable "env" {}
+variable "env" {
+  type = string
+  default = ""
+}
+
+variable "region" {
+  type = string
+  default = "eu-west-1"
+}
+
 variable "cidr_block" {}
 variable "subnet_priv_bits" {}
 variable "subnet_pub_bits" {}
@@ -30,6 +38,7 @@ variable "r53_ttl" {
 
 variable "multi_nat_enabled" {
   default = false
+  description = "Define if we created one NAT GW per AZ available or not"
 }
 
 variable "s3_endpoint_enabled" {

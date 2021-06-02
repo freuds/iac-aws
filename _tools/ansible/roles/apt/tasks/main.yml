@@ -1,8 +1,0 @@
----
-- name: APT update
-  apt: update_cache=yes force=yes
-
-- name: install apt packages
-  apt:
-    name: "{{ apt_dependencies + apt_common_packages + apt_specific_packages }}"
-    state: present

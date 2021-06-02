@@ -1,0 +1,3 @@
+workspaces {
+    name = "cloudfront-staging-eu-west-1"
+}

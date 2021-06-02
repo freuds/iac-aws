@@ -1,5 +1,0 @@
-{% raw %}
-{{- range $index, $element := (getenv "LE_CERTS" | jsonArray) -}}
-{{ $element }}
-{{ end -}}
-{% endraw %}

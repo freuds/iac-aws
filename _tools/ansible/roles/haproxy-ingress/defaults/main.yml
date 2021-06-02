@@ -1,8 +1,0 @@
----
-helm_repo_haproxy_url: https://haproxytech.github.io/helm-charts
-helm_repo_haproxy_name: haproxytech
-helm_haproxy_chart_name: kubernetes-ingress
-
-# default k3s configuration file
-kubeconfig: /etc/rancher/k3s/k3s.yaml
-namespace: default

@@ -35,7 +35,7 @@ resource "aws_internet_gateway" "gw" {
   vpc_id = aws_vpc.main.id
 
   tags = {
-    Name = "${var.env}-igw"
+    Name = format("%s-igw", var.env)
   }
 }
 
@@ -43,7 +43,8 @@ resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
 
   tags = {
-    Name = "${var.env}-pub-rt"
+    Name = format("%s-pub-rt", var.env),
+    Environment = var.env
   }
 }
 
@@ -68,74 +69,116 @@ resource "aws_route_table_association" "rta-pub" {
 #   cidr_block              = cidrsubnet(var.cidr_block, var.subnet_priv_bits, index(lookup(var.azs, var.region), each.key))
 #   availability_zone       = each.key
 #   map_public_ip_on_launch = "false"
-#   tags = merge(
-#   var.eks_private_subnet_tags,
-#   map("Name", "${var.env}-prv-subnet-${trimprefix(each.key, var.region)}"
-#   ))
-# }
-
-# resource "aws_elasticache_subnet_group" "ec-subnet-group" {
-#   name        = "${var.env}-ec-subnet-group"
-#   description = "Elastic Cache Subnet Group"
-#   subnet_ids  = [for o in aws_subnet.private : o.id]
-# }
-
-# resource "aws_db_subnet_group" "db-subnet-group" {
-#   name        = "${var.env}-db-subnet-group"
-#   description = "RDS DB Subnet Group"
-#   subnet_ids  = [for o in aws_subnet.private : o.id]
-
-#   tags = {
-#     Name = "${var.env}-db-subnet-group"
-#   }
+#     tags = merge(
+#     {
+#       "Name" = format("%s-pub-subnet-%s", var.env, trimprefix(each.key, var.region))
+#     },
+#     var.eks_private_subnet_tags,
+#   )
 # }
 
 
-# Ressources for Private subnets
 
-// Multi NAT GW Handling
-# resource "aws_eip" "nat-gw-a" {
-#   count = var.multi_nat_enabled ? 1 : 0
-#   tags  = {
-#     Name        = "nat-gw-a-eip",
-#     Environment = var.env
-#   }
+##
+# Zone Public Route53
+##
+resource "aws_route53_zone" "public" {
+  name = var.external_domain_name
+}
+
+####################################
+# Multi-NAT-GW : EIP
+####################################
+resource "aws_eip" "eip-multi" {
+  for_each       = var.multi_nat_enabled ? toset(lookup(var.azs, var.region)) : []
+  tags  = {
+    Name = format("%s-eip-%s", var.env, trimprefix(each.key, var.region)),
+    Environment = var.env
+  }
+}
+
+####################################
+# Multi-NAT-GW :
+####################################
+resource "aws_nat_gateway" "nat-gw-multi" {
+
+  for_each       = var.multi_nat_enabled ? toset(lookup(var.azs, var.region)) : []
+  allocation_id  = aws_eip.eip-multi[each.key].id
+  subnet_id      = element([for o in aws_subnet.public : o.id], index(lookup(var.azs, var.region), each.key))
+
+  lifecycle {
+    create_before_destroy = true
+  }
+  tags  = {
+    "Name" = format("%s-natgw-%s", var.env, trimprefix(each.key, var.region)),
+    "Environment" = var.env
+  }
+}
+
+####################################
+# Multi-NAT-GW : records public
+####################################
+resource "aws_route53_record" "nat-gw-multi-record" {
+
+  for_each = var.multi_nat_enabled ? toset(lookup(var.azs, var.region)) : []
+  zone_id = aws_route53_zone.public.id
+  name    = format("natgw-%s", trimprefix(each.key, var.region))
+  type    = "A"
+  ttl     = var.r53_ttl
+  records = [
+    aws_nat_gateway.nat-gw-multi[each.value].public_ip
+  ]
+}
+
+####################################
+# Single-NAT-GW : EIP
+####################################
+resource "aws_eip" "eip-single" {
+  count = !var.multi_nat_enabled ? 1 : 0
+  tags  = {
+    "Name" = format("%s-eip", var.env),
+    "Environment" = var.env
+  }
+}
+
+####################################
+# Single-NAT-GW :
+####################################
+resource "aws_nat_gateway" "nat-gw" {
+  count         = !var.multi_nat_enabled ? 1 : 0
+  allocation_id = aws_eip.eip-single[count.index].id
+  subnet_id     = aws_subnet.public[element(lookup(var.azs, var.region), 0)].id
+  tags  = {
+    "Name" = format("%s-natgw-%s", var.env, trimprefix(element(lookup(var.azs, var.region), 0), var.region)),
+    "Environment" = var.env
+  }
+}
+
+####################################
+# Single-NAT-GW : Record DNS
+####################################
+resource "aws_route53_record" "nat-gw-record" {
+  count   = !var.multi_nat_enabled ? 1 : 0
+  zone_id = aws_route53_zone.public.id
+  name    = "natgw"
+  type    = "A"
+  ttl     = var.r53_ttl
+  records = [
+    aws_nat_gateway.nat-gw[count.index].public_ip
+    ]
+}
+
+
+# resource "aws_route" "private-nat-default" {
+#   count                  = !var.multi_nat_enabled ? length(lookup(var.azs, var.region)) : 0
+#   route_table_id         = aws_route_table.private[element(lookup(var.azs, var.region), count.index)].id
+#   destination_cidr_block = "0.0.0.0/0"
+#   nat_gateway_id         = aws_nat_gateway.nat-gw.0.id
 # }
 
-# resource "aws_eip" "nat-gw-b" {
-#   count = var.multi_nat_enabled ? 1 : 0
-#   tags  = {
-#     Name        = "nat-gw-b-eip"
-#     Environment = var.env
-#   }
-# }
-
-# resource "aws_eip" "nat-gw-c" {
-#   count = var.multi_nat_enabled ? 1 : 0
-#   tags  = {
-#     Name        = "nat-gw-c-eip"
-#     Environment = var.env
-#   }
-# }
-
-# resource "aws_nat_gateway" "nat-gw-a" {
-#   count         = var.multi_nat_enabled ? 1 : 0
-#   allocation_id = aws_eip.nat-gw-a[count.index].id
-#   subnet_id     = aws_subnet.public[element(lookup(var.azs, var.region), 0)].id
-# }
-
-# resource "aws_nat_gateway" "nat-gw-b" {
-#   count         = var.multi_nat_enabled ? 1 : 0
-#   allocation_id = aws_eip.nat-gw-b[count.index].id
-#   subnet_id     = aws_subnet.public[element(lookup(var.azs, var.region), 0)].id
-# }
-
-# resource "aws_nat_gateway" "nat-gw-c" {
-#   count         = var.multi_nat_enabled ? 1 : 0
-#   allocation_id = aws_eip.nat-gw-c[count.index].id
-#   subnet_id     = aws_subnet.public[element(lookup(var.azs, var.region), 0)].id
-# }
-
+##
+# Public records for nat gateway
+##
 # resource "aws_route53_record" "nat-gw-record-a" {
 #   count   = var.multi_nat_enabled ? 1 : 0
 #   zone_id = aws_route53_zone.public.id
@@ -143,7 +186,7 @@ resource "aws_route_table_association" "rta-pub" {
 #   type    = "A"
 #   ttl     = var.r53_ttl
 #   records = [
-#     aws_nat_gateway.nat-gw-a[count.index].public_ip]
+#     aws_nat_gaeway.nat-gw-a[count.index].public_ip]
 # }
 
 # resource "aws_route53_record" "nat_gw_record_b" {
@@ -210,39 +253,33 @@ resource "aws_route_table_association" "rta-pub" {
 #   }
 # }
 
-# // Single NAT GW Handling
-# resource "aws_eip" "nat-gw" {
-#   count = !var.multi_nat_enabled ? 1 : 0
+
+
+##
+# ElastiCache subnets
+##
+# resource "aws_elasticache_subnet_group" "ec-subnet-group" {
+#   name        = "${var.env}-ec-subnet-group"
+#   description = "Elastic Cache Subnet Group"
+#   subnet_ids  = [for o in aws_subnet.private : o.id]
+# }
+
+##
+# RDS subnets
+##
+# resource "aws_db_subnet_group" "db-subnet-group" {
+#   name        = "${var.env}-db-subnet-group"
+#   description = "RDS DB Subnet Group"
+#   subnet_ids  = [for o in aws_subnet.private : o.id]
+
+#   tags = {
+#     Name = "${var.env}-db-subnet-group"
+#   }
 # }
 
 
-# resource "aws_nat_gateway" "nat-gw" {
-#   count         = !var.multi_nat_enabled ? 1 : 0
-#   allocation_id = aws_eip.nat-gw[count.index].id
-#   subnet_id     = aws_subnet.public[element(lookup(var.azs, var.region), 0)].id
-# }
-
-# resource "aws_route53_record" "nat-gw-record" {
-#   count   = !var.multi_nat_enabled ? 1 : 0
-#   zone_id = aws_route53_zone.public.id
-#   name    = "natgw"
-#   type    = "A"
-#   ttl     = var.r53_ttl
-#   records = [
-#     aws_nat_gateway.nat-gw[count.index].public_ip]
-# }
 
 
-# resource "aws_route" "private-nat-default" {
-#   count                  = !var.multi_nat_enabled ? length(lookup(var.azs, var.region)) : 0
-#   route_table_id         = aws_route_table.private[element(lookup(var.azs, var.region), count.index)].id
-#   destination_cidr_block = "0.0.0.0/0"
-#   nat_gateway_id         = aws_nat_gateway.nat-gw.0.id
-# }
-
-# resource "aws_route53_zone" "public" {
-#   name = var.external_domain_name
-# }
 
 # resource "aws_vpc_endpoint" "s3" {
 #   count           = var.s3_endpoint_enabled ? 1 : 0

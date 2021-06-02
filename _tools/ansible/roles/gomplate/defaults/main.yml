@@ -1,7 +1,0 @@
----
-gomplate_version: 'v3.5.0'
-gomplate_arch: 'amd64'
-gomplate_os: 'linux'
-gomplate_slim: ''
-gomplate_binary_download_url: 'https://github.com/hairyhenderson/gomplate/releases/download/{{ gomplate_version }}/gomplate_{{ gomplate_os }}-{{ gomplate_arch }}{{ gomplate_slim }}'
-gomplate_binary_install_path: '/usr/local/bin/gomplate'

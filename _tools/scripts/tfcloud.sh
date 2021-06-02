@@ -60,8 +60,8 @@ fi
 HOST="${1:-app.terraform.io}"
 TERRAFORM_VERSION=$(terraform version -json | jq -r '.terraform_version')
 # Get owner email and organization_name from json
-ORGANIZATION_NAME=$(jq -r '.organization_name' tf-organization.json)
-ADMIN_OWNER=$(jq -r '.admin_email' tf-organization.json)
+ORGANIZATION_NAME=$(jq -r '.organization_name' organization.json)
+ADMIN_OWNER=$(jq -r '.admin_email' organization.json)
 
 # create organization
 create_organization() {

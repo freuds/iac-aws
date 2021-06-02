@@ -1,6 +1,0 @@
-#!/bin/bash
-for file in /etc/haproxy/*.cfg; do
-test -f $file
-CNF="$CNF -f $file"
-done
-echo "CONF='$CNF'" > /etc/haproxy/haproxy-multiconf.lst

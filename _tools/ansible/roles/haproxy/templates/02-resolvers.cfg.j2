@@ -1,7 +1,0 @@
-# HAProxy resolver {{ item.name }}
-# {{ ansible_managed }}
-resolvers {{ item.name }}
-    nameserver {{ item.name }}  {{ item.fqdn }}:{{ item.port }}
-    resolve_retries     {{ item.resolve_retries}}
-    timeout retry       {{ item.resolve_retry_timeout }}
-    hold valid          {{ item.resolve_hold_valid }}
