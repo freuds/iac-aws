@@ -18,25 +18,17 @@ output "public_subnets" {
   value = module.vpc.public_subnets
 }
 
-# output "private_subnets" {
-#   value = module.vpc.private_subnets
-# }
+output "private_subnets" {
+  value = module.vpc.private_subnets
+}
 
-# output "r53_private_zone" {
-#   value = module.vpc.private_host_zone
-# }
+output "r53_private_zone" {
+  value = module.vpc.private_host_zone
+}
 
-# output "r53_public_zone" {
-#   value = module.vpc.public_host_zone
-# }
-
-# output "r53_public_zone_id" {
-#   value = module.vpc.public_host_zone_id
-# }
-
-# output "private_domain" {
-#   value = module.vpc.private_domain_name
-# }
+output "private_domain" {
+  value = module.vpc.private_domain_name
+}
 
 output "public_domain" {
   value = module.vpc.public_domain_name

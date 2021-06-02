@@ -1,10 +1,10 @@
 variable "env" {
-  type = string
+  type    = string
   default = ""
 }
 
 variable "region" {
-  type = string
+  type    = string
   default = "eu-west-1"
 }
 
@@ -16,19 +16,19 @@ variable "internal_domain_name" {}
 variable "external_domain_name" {}
 
 variable "azs" {
-  type    = map(list(string))
+  type = map(list(string))
   default = {
     eu-west-1 = [
       "eu-west-1a",
       "eu-west-1b",
-      "eu-west-1c"]
+    "eu-west-1c"]
     us-east-1 = [
       "us-east-1a",
       "us-east-1b",
       "us-east-1c",
       "us-east-1d",
       "us-east-1e",
-      "us-east-1f"]
+    "us-east-1f"]
   }
 }
 
@@ -36,8 +36,8 @@ variable "r53_ttl" {
   default = 300
 }
 
-variable "multi_nat_enabled" {
-  default = false
+variable "one_nat_gateway_per_az" {
+  default     = false
   description = "Define if we created one NAT GW per AZ available or not"
 }
 
