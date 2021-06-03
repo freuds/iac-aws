@@ -6,21 +6,9 @@ output "azs" {
   value = var.azs
 }
 
-# output "vpc_dns_srv_ip" {
-#   value = cidrhost(var.cidr_block, 2)
-# }
-
 output "private_host_zone" {
   value = aws_route53_zone.private.id
 }
-
-# output "public_host_zone" {
-#   value = aws_route53_zone.public.id
-# }
-
-# output "public_host_zone_id" {
-#   value = aws_route53_zone.public.zone_id
-# }
 
 output "private_domain_name" {
   value = var.internal_domain_name
@@ -65,3 +53,16 @@ output "private_subnets_cidr" {
 # output "prod_ssl_cert_arn" {
 #   value = local.prod_ssl_cert_arn
 # }
+
+# output "vpc_dns_srv_ip" {
+#   value = cidrhost(var.cidr_block, 2)
+# }
+
+# output "public_host_zone" {
+#   value = aws_route53_zone.public.id
+# }
+
+# output "public_host_zone_id" {
+#   value = aws_route53_zone.public.zone_id
+# }
+
