@@ -1,3 +1,0 @@
-workspaces {
-    name = "cloudfront-prod-eu-west-1"
-}

@@ -30,6 +30,7 @@
 
 ### Packer ###
 # Cache objects
+packer.out
 packer_cache/
 
 # Crash log
