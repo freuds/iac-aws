@@ -2,15 +2,18 @@
 
 ## VPC
 
-Create custom VPC and 2 public subnet and 2 private subnet
+Create custom VPC 
+- 1 public subnet per AZ
+- 1 private subnet per AZ
+- 1 Internet Gateway
+- 1 Route Table public
 
-### Multi NAT
+> HA Mode : Multi NAT or Single NAT
 
-- build one NAT Gateway on all AZs defined
+variable __one_nat_gateway_per_az__ , disabled by default (false), can found in vpc/_terraform/variables.tf
 
-### Single NAT
-
-- build only one NAT Gateway for one subnet
+- build one NAT Gateway on each AZs defined
+- build only one NAT Gateway for all AZs subnet
 
 ## Terraform Cloud uage
 ## Tree Structure for tools/libraries

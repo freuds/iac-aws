@@ -6,10 +6,10 @@ module "vpc" {
   subnet_priv_bits        = var.subnet_priv_bits
   subnet_pub_bits         = var.subnet_pub_bits
   subnet_pub_offset       = var.subnet_pub_offset
+  subnet_priv_tags        = var.subnet_priv_tags
+  subnet_pub_tags         = var.subnet_pub_tags
   internal_domain_name    = var.internal_domain_name
   external_domain_name    = var.external_domain_name
-  eks_public_subnet_tags  = var.eks_public_subnet_tags
-  eks_private_subnet_tags = var.eks_private_subnet_tags
   one_nat_gateway_per_az  = var.one_nat_gateway_per_az
 }
 

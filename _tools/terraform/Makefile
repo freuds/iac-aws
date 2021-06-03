@@ -46,6 +46,10 @@ apply:	## Make terraform apply
 	@$(call green, "Apply Terraform")
 	@terraform apply
 
+apply-force: ## Make terraform apply --auto-approve
+	@$(call green, "Auto-Apply Terraform")
+	@terraform apply --auto-approve
+
 destroy:  ## Plan terraform destroy
 	@$(call red, "Plan Destroy Terraform")
 	@terraform plan -destroy

@@ -10,12 +10,12 @@ external_domain_name  = "qa.fred-iac.freuds.me"
 one_nat_gateway_per_az = false
 
 # bastion_ami           = "ami-03d4ce558fcf83f5b"
-# datadog_agent_enabled = false
-# eks_private_subnet_tags = {
+
+# subnet_priv_tags = {
 #   "kubernetes.io/cluster/qa-eks-cluster" = "shared"
 #   "kubernetes.io/role/internal-elb"      = "1"
 # }
-# eks_public_subnet_tags = {
+# subnet_pub_tags = {
 #   "kubernetes.io/cluster/qa-eks-cluster" = "shared"
 #   "kubernetes.io/role/elb"               = "1"
 # }

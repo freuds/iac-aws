@@ -1,19 +1,19 @@
-##
+####################################
 # VPC
-##
+####################################
 resource "aws_vpc" "main" {
   cidr_block           = var.cidr_block
   enable_dns_hostnames = "true"
   enable_dns_support   = "true"
 
   tags = {
-    Name = "${var.env}-vpc"
+    Name = format("%s-vpc", var.env)
   }
 }
 
-##
+####################################
 # Public subnets
-##
+####################################
 resource "aws_subnet" "public" {
   for_each                = toset(lookup(var.azs, var.region))
   vpc_id                  = aws_vpc.main.id
@@ -22,20 +22,22 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = "true"
   tags = merge(
     {
-      "Name" = format("%s-pub-subnet-%s", var.env, trimprefix(each.key, var.region))
+      Name = format("%s-pub-subnet-%s", var.env, trimprefix(each.key, var.region)),
+      Environment = var.env
     },
-    var.eks_public_subnet_tags,
+    var.subnet_pub_tags,
   )
 }
 
-##
+####################################
 # Ressources for Publics subnets
-##
+####################################
 resource "aws_internet_gateway" "gw" {
   vpc_id = aws_vpc.main.id
 
   tags = {
-    Name = format("%s-igw", var.env)
+    Name = format("%s-igw", var.env),
+    Environment = var.env
   }
 }
 
@@ -60,9 +62,9 @@ resource "aws_route_table_association" "rta-pub" {
   route_table_id = aws_route_table.public.id
 }
 
-##
+####################################
 # Zone Public Route53
-##
+####################################
 resource "aws_route53_zone" "public" {
   name = var.external_domain_name
 }
@@ -73,8 +75,8 @@ resource "aws_route53_zone" "public" {
 resource "aws_eip" "single-eip" {
   count = !var.one_nat_gateway_per_az ? 1 : 0
   tags  = {
-    "Name" = format("%s-single-eip", var.env),
-    "Environment" = var.env
+    Name = format("%s-eip", var.env),
+    Environment = var.env
   }
 }
 
@@ -86,8 +88,8 @@ resource "aws_nat_gateway" "single-natgw" {
   allocation_id = aws_eip.single-eip[count.index].id
   subnet_id     = aws_subnet.public[element(lookup(var.azs, var.region), 0)].id
   tags  = {
-    "Name" = format("%s-single-natgw-%s", var.env, trimprefix(element(lookup(var.azs, var.region), 0), var.region)),
-    "Environment" = var.env
+    Name = format("%s-natgw-%s", var.env, trimprefix(element(lookup(var.azs, var.region), 0), var.region)),
+    Environment = var.env
   }
 }
 
@@ -111,7 +113,7 @@ resource "aws_route53_record" "single-natgw-record" {
 resource "aws_eip" "multi-eip" {
   for_each       = var.one_nat_gateway_per_az ? toset(lookup(var.azs, var.region)) : []
   tags  = {
-    Name = format("%s-multi-eip-%s", var.env, trimprefix(each.key, var.region)),
+    Name = format("%s-eip-%s", var.env, trimprefix(each.key, var.region)),
     Environment = var.env
   }
 }
@@ -125,12 +127,13 @@ resource "aws_nat_gateway" "multi-natgw" {
   allocation_id  = aws_eip.multi-eip[each.key].id
   subnet_id      = element([for o in aws_subnet.public : o.id], index(lookup(var.azs, var.region), each.key))
 
+  tags  = {
+    Name = format("%s-natgw-%s", var.env, trimprefix(each.key, var.region)),
+    Environment = var.env
+  }
+
   lifecycle {
     create_before_destroy = true
-  }
-  tags  = {
-    "Name" = format("%s-natgw-%s", var.env, trimprefix(each.key, var.region)),
-    "Environment" = var.env
   }
 }
 
@@ -160,32 +163,42 @@ resource "aws_subnet" "private" {
   map_public_ip_on_launch = "false"
   tags = merge(
     {
-      "Name" = format("%s-priv-subnet-%s", var.env, trimprefix(each.key, var.region))
+      Name = format("%s-priv-subnet-%s", var.env, trimprefix(each.key, var.region)),
+      Environment = var.env
     },
-    var.eks_private_subnet_tags,
+    var.subnet_priv_tags,
   )
 }
 
-resource "aws_route" "private-default" {
-  count                  = !var.one_nat_gateway_per_az ? length(lookup(var.azs, var.region)) : 0
-  route_table_id         = aws_route_table.private.id
-  destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = !var.one_nat_gateway_per_az ? aws_nat_gateway.single-natgw.0.id : aws_nat_gateway.multi-natgw.0.id
-}
-
+####################################
+# Private route table
+####################################
 resource "aws_route_table" "private" {
-  vpc_id = aws_vpc.main.id
+  for_each = toset(lookup(var.azs, var.region))
+  vpc_id   = aws_vpc.main.id
 
   tags = {
-    Name = format("%s-priv-rt", var.env),
+    Name        = format("%s-priv-rt-%s", var.env, trimprefix(each.key, var.region)),
     Environment = var.env
   }
 }
-
+####################################
+# Private route table association
+####################################
 resource "aws_route_table_association" "rta-prv" {
   for_each       = toset(lookup(var.azs, var.region))
   subnet_id      = element([for o in aws_subnet.private : o.id], index(lookup(var.azs, var.region), each.key))
-  route_table_id = aws_route_table.private.id
+  route_table_id = aws_route_table.private[each.value].id
+}
+
+####################################
+# Private route
+####################################
+resource "aws_route" "private-default" {
+  for_each               = toset(lookup(var.azs, var.region))
+  route_table_id         = aws_route_table.private[each.value].id
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id         = var.one_nat_gateway_per_az ? aws_nat_gateway.multi-natgw[each.value].id : aws_nat_gateway.single-natgw.0.id 
 }
 
 resource "aws_route53_zone" "private" {
@@ -194,24 +207,6 @@ resource "aws_route53_zone" "private" {
     vpc_id = aws_vpc.main.id
   }
 }
-
-####################################
-# Multi-NAT-GW :
-####################################
-# resource "aws_nat_gateway" "multi-natgw" {
-
-#   for_each       = var.one_nat_gateway_per_az ? toset(lookup(var.azs, var.region)) : []
-#   allocation_id  = aws_eip.multi-eip[each.key].id
-#   subnet_id      = element([for o in aws_subnet.private : o.id], index(lookup(var.azs, var.region), each.key))
-
-#   lifecycle {
-#     create_before_destroy = true
-#   }
-#   tags  = {
-#     "Name" = format("%s-natgw-%s", var.env, trimprefix(each.key, var.region)),
-#     "Environment" = var.env
-#   }
-# }
 
 ##
 # ElastiCache subnets
@@ -234,10 +229,6 @@ resource "aws_route53_zone" "private" {
 #     Name = "${var.env}-db-subnet-group"
 #   }
 # }
-
-
-
-
 
 # resource "aws_vpc_endpoint" "s3" {
 #   count           = var.s3_endpoint_enabled ? 1 : 0
