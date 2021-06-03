@@ -13,6 +13,10 @@ fail() {
   printf "\r\033[0;31m$1\033[0m\n"
 }
 
+warm() {
+  printf "\r\033[0;33m$1\033[0m\n"
+}
+
 divider() {
   printf "\r\033[0;1m========================================================================\033[0m\n"
 }
@@ -131,6 +135,7 @@ REQUEST_BODY
   fi
 }
 
+###############################################################################
 # Check that we've already authenticated via Terraform in the static credentials
 # file.
 CREDENTIALS_FILE="$HOME/.terraform.d/credentials.tfrc.json"
@@ -143,43 +148,37 @@ fi
 
 # Create a Terraform Cloud organization
 clear
+divider
 echo "Creating an organization if needed ..."
-# create_organization
-
+create_organization
 divider
 echo
 
 # update organizations name for each _backend.tf file
-# BACKEND_TF_LIST=($(find . -type f -name "backend.tf"))
-# for BACKEND_TF in "${BACKEND_TF_LIST[@]}"
-# do
-#   echo "Found terraform backend file : ${BACKEND_TF}"
-#   if ! grep "organization = \"${ORGANIZATION_NAME}\"" $BACKEND_TF 2>&1 >/dev/null ; then
-#     info "Need to change this file ^^^"
-#     # We don't sed -i because MacOS's sed has problems with it.
-#     TEMP=$(mktemp)
-#     cat $BACKEND_TF |
-#       sed -e "s/.* organization = \".*\"/    organization = \"${ORGANIZATION_NAME}\"/" \
-#         > $TEMP
-#     mv $TEMP $BACKEND_TF
-#     chmod 0644 $BACKEND_TF
-#     terraform fmt $BACKEND_TF
-#   fi
-# done
+find . -type f -name "backend.tf" -print0 | while read -d $'\0' BACKEND_TF
+do
+  echo "Found terraform backend file : ${BACKEND_TF}"
+  if ! grep "organization = \"${ORGANIZATION_NAME}\"" $BACKEND_TF 2>&1 >/dev/null ; then
+    info "Need to change this file ^^^"
+    TEMP=$(mktemp)
+    cat $BACKEND_TF |
+      sed -e "s/.* organization = \".*\"/    organization = \"${ORGANIZATION_NAME}\"/" \
+        > $TEMP
+    mv $TEMP $BACKEND_TF
+    chmod 0644 $BACKEND_TF
+    terraform fmt $BACKEND_TF
+  fi
+done
 
 divider
 echo
 
 # Workspaces creation
-# Based on each .terraform-config file present in service/env/region folders
-# CONFIG_TF_LIST=($(find . -type f -name ".terraform-config"))
-
+# Based on each .terraform-config file present in service/env/region directories
 find . -type f -name ".terraform-config" -print0 | while read -d $'\0' CONFIG_TF
-# for CONFIG_TF in ${CONFIG_TF_LIST[@]}
 do
   echo "Found terraform config file : ${CONFIG_TF}"
 
-  FILENAME=$CONFIG_TF
   OLDIFS=$IFS
   IFS='/' array=($CONFIG_TF)
   IFS=$OLDIFS
@@ -187,25 +186,24 @@ do
   _SERVICE="${array[1]}"
   _ENV="${array[2]}"
   _REGION="${array[3]}"
+
   WORKSPACE_NAME="${_SERVICE}-${_ENV}-${_REGION}"
   WORKING_DIRECTORY="${_SERVICE}/${_ENV}/${_REGION}"
 
-  echo "WORKSPACE_NAME: $WORKSPACE_NAME"
-  echo "WORKING_DIRECTORY: $WORKING_DIRECTORY"
-
   # check if .terraform-config is existing and correct
-  if ! grep "name = \"${WORKSPACE_NAME}\"" $FILENAME 2>&1 >/dev/null ; then
+  if ! grep "name = \"${WORKSPACE_NAME}\"" $CONFIG_TF 2>&1 >/dev/null ; then
     info "Need to change this file ^^^"
     TEMP=$(mktemp)
-    cat $FILENAME |
+    cat $CONFIG_TF |
       sed -e "s/.*name = \".*\"/    name = \"${WORKSPACE_NAME}\"/" \
         > $TEMP
-    mv $TEMP $FILENAME
-    chmod 0644 $FILENAME
+    mv $TEMP $CONFIG_TF
+    chmod 0644 $CONFIG_TF
   fi
 
-  echo "Creating workspace if needed ..."
-  # create_workspace ${WORKSPACE_NAME} ${WORKING_DIRECTORY}
+  echo "If needed we create workspace : ${WORKSPACE_NAME} ..."
+  create_workspace ${WORKSPACE_NAME} ${WORKING_DIRECTORY}
+  echo
 
 done
 
