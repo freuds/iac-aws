@@ -58,11 +58,11 @@ output "private_subnets_cidr" {
 #   value = cidrhost(var.cidr_block, 2)
 # }
 
-# output "public_host_zone" {
-#   value = aws_route53_zone.public.id
-# }
+output "public_host_zone" {
+  value = aws_route53_zone.public.id
+}
 
-# output "public_host_zone_id" {
-#   value = aws_route53_zone.public.zone_id
-# }
+output "public_host_zone_id" {
+  value = aws_route53_zone.public.zone_id
+}
 

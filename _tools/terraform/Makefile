@@ -93,7 +93,7 @@ cleanlinks:
 	@if [ -L _variables.tf ] ; then unlink _variables.tf; fi
 	@if [ -L _remote-states.tf ] ; then unlink _remote-states.tf; fi
 	@if [ -L .terraform-version ] ; then unlink .terraform-version; fi
-	@if [ -L init.tpl ] ; then unlink init.tpl; fi
+# @if [ -L init.tpl ] ; then unlink init.tpl; fi
 	@if [ -L irsa.tf ] ; then unlink irsa.tf; fi
 
 symlinks:
@@ -105,5 +105,5 @@ symlinks:
 	@if [ ! -L _variables.tf ] ; then ln -s ../../_terraform/variables.tf _variables.tf; fi
 	@if [ ! -L _remote-states.tf ] && [ -f ../../_terraform/remote-states.tf ] ; then ln -s ../../_terraform/remote-states.tf _remote-states.tf; fi
 	@if [ ! -L .terraform-version ] && [ ! -f .terraform-version ] ; then ln -s ../../_terraform/.terraform-version .terraform-version; fi
-	@if [ ! -L init.tpl ] && [ -f ../../_terraform/init.tpl ] ; then ln -s ../../_terraform/init.tpl init.tpl;fi
+# @if [ ! -L init.tpl ] && [ -f ../../_terraform/init.tpl ] ; then ln -s ../../_terraform/init.tpl init.tpl;fi
 	@if [ ! -L irsa.tf ] && [ -f ../../_terraform/irsa.tf ] ; then ln -s ../../_terraform/irsa.tf irsa.tf; fi

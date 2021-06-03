@@ -13,19 +13,36 @@ module "vpc" {
   one_nat_gateway_per_az  = var.one_nat_gateway_per_az
 }
 
-# data "template_file" "extra-userdata" {
-#   template = file("${path.cwd}/../../_terraform/init.tpl")
+module "bastion" {
+  source                     = "git@github.com:xxxxxxxxxxxxxx/terraform-aws-bastion.git"
+  region                     = var.region
+  env                        = var.env
+  vpc_id                     = module.vpc.vpc_id
+  ami                        = var.bastion_ami
+  instance_type              = var.bastion_instance_type
+  asg_desired_capacity       = var.bastion_asg_desired_capacity
+  asg_min_size               = var.bastion_asg_min_size
+  asg_max_size               = var.bastion_asg_max_size
+  aws_route53_zone_public_id = module.vpc.public_host_zone
+  subnet_ids                 = module.vpc.public_subnets
+  # s3_vault_bucket            = data.terraform_remote_state.baseline.outputs.s3-vault-bucket
+  # root_keypair               = data.terraform_remote_state.baseline.outputs.root_keypair
+  extra_userdata             = data.template_file.extra-userdata.rendered
+}
 
-#   vars = {
-#     db_script      = data.template_file.db-import.rendered
-#     id_phenix_pub  = var.id_phenix_pub
-#     id_phenix_priv = var.id_phenix_priv
+data "template_file" "extra-userdata" {
+  template = file("${path.cwd}/../../_terraform/init.tpl")
 
-#     datadog_api_key       = var.DATADOG_API_KEY
-#     datadog_tag_env       = var.env
-#     datadog_agent_enabled = var.datadog_agent_enabled
-#   }
-# }
+  # vars = {
+  #   db_script      = data.template_file.db-import.rendered
+  #   id_phenix_pub  = var.id_phenix_pub
+  #   id_phenix_priv = var.id_phenix_priv
+
+  #   datadog_api_key       = var.DATADOG_API_KEY
+  #   datadog_tag_env       = var.env
+  #   datadog_agent_enabled = var.datadog_agent_enabled
+  # }
+}
 
 # data "template_file" "db-import" {
 #   template = file("${path.cwd}/../../_terraform/db-import.sh.tpl")
@@ -36,21 +53,4 @@ module "vpc" {
 #     db_password = var.db_password
 #     db_name     = var.db_name
 #   }
-# }
-
-# module "bastion" {
-#   source                     = "git@github.com:born2scale/terraform-aws-bastion.git"
-#   region                     = var.region
-#   vpc_id                     = module.vpc.vpc_id
-#   ami                        = var.bastion_ami
-#   instance_type              = var.bastion_instance_type
-#   asg_desired_capacity       = var.bastion_asg_desired_capacity
-#   asg_min_size               = var.bastion_asg_min_size
-#   asg_max_size               = var.bastion_asg_max_size
-#   aws_route53_zone_public_id = module.vpc.public_host_zone
-#   env                        = var.env
-#   subnet_ids                 = module.vpc.public_subnets
-#   s3_vault_bucket            = data.terraform_remote_state.baseline.outputs.s3-vault-bucket
-#   root_keypair               = data.terraform_remote_state.baseline.outputs.root_keypair
-#   extra_userdata             = data.template_file.extra-userdata.rendered
 # }

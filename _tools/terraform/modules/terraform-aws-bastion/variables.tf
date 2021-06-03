@@ -8,9 +8,6 @@ variable "ami" {
 variable "env" {
 }
 
-variable "role" {
-  default = "server"
-}
 variable "instance_type" {
   default = "t3.micro"
 }
@@ -85,8 +82,8 @@ variable "subnet_ids" {
   default = []
 }
 
-variable "s3_vault_bucket" {
-}
+# variable "s3_vault_bucket" {
+# }
 
-variable "root_keypair" {
-}
+# variable "root_keypair" {
+# }

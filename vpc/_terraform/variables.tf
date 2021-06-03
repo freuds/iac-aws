@@ -44,26 +44,35 @@ variable "one_nat_gateway_per_az" {
 }
 
 variable "bastion_ami" {
-  default = "ami-2547a34c"
+  default = "ami-0874dad5025ca362c"
 }
 
 variable "bastion_instance_type" {
   default = "t3.micro"
+  type = string
+  description = "EC2 instance type default"
 }
+
 variable "bastion_asg_desired_capacity" {
   type    = number
   default = 1
+  description = "Define the desired capacity for the AutoScalingGroup"
 }
+
 variable "bastion_asg_min_size" {
   type    = number
   default = 1
+  description = "Define the minimum size for the AutoScalingGroup"
 }
+
 variable "bastion_asg_max_size" {
   type    = number
   default = 1
+  description = "Define the maximum size for the AutoScalingGroup"
+
 }
 
-variable "db_name" {
-  type    = string
-  default = "database"
-}
+# variable "db_name" {
+#   type    = string
+#   default = "database"
+# }

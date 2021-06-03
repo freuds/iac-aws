@@ -9,7 +9,7 @@ external_domain_name  = "qa.fred-iac.freuds.me"
 
 one_nat_gateway_per_az = false
 
-# bastion_ami           = "ami-03d4ce558fcf83f5b"
+# bastion_ami           = "ami-03d4ce558fcf83f5b" ami-0874dad5025ca362c
 
 # subnet_priv_tags = {
 #   "kubernetes.io/cluster/qa-eks-cluster" = "shared"

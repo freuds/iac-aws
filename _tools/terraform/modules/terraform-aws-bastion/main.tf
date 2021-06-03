@@ -1,3 +1,6 @@
+########################################
+# SG bastion ssh ingress
+########################################
 resource "aws_security_group" "bastion" {
   name        = "sgp-bastion"
   vpc_id      = var.vpc_id
@@ -9,16 +12,18 @@ resource "aws_security_group" "bastion" {
     cidr_blocks = var.cidr_blocks
   }
   tags        = {
-    Name    = "sg-${var.env}-${var.service}-${var.role}",
+    Name    = "sg-${var.env}-${var.service}",
     Service = var.service
-    Role    = var.role
-    Env     = var.env
+    Environment = var.env
   }
   lifecycle {
     create_before_destroy = true
   }
 }
 
+########################################
+# SG bastion ssh egress
+########################################
 resource "aws_security_group" "allow-all-egress" {
   name        = "sgp-allow-all-egress"
   vpc_id      = var.vpc_id
@@ -30,13 +35,18 @@ resource "aws_security_group" "allow-all-egress" {
     cidr_blocks = var.outbound_cidr_blocks
   }
   tags        = {
-    Name    = "sg-allow-all-egress"
+    Name    = "sg-allow-all-egress",
+    Service = var.service
+    Environment = var.env
   }
   lifecycle {
     create_before_destroy = true
   }
 }
 
+########################################
+# SG bastion ssh from bastion
+########################################
 resource "aws_security_group" "ssh-from-bastion" {
   name        = "sgp-ssh-from-bastion"
   description = "Allow all ssh from remote bastion servers"
@@ -51,23 +61,24 @@ resource "aws_security_group" "ssh-from-bastion" {
   tags        = {
     Name    = "sg-ssh-from-bastion",
     Service = var.service
-    Role    = var.role
-    Env     = var.env
+    Environment = var.env
   }
   lifecycle {
     create_before_destroy = true
   }
 }
 
+########################################
+# Userdata init script
+########################################
 data "template_file" "embedded_userdata" {
   template = file("${path.module}/init.tpl")
 
-  vars = {
-    s3_vault_bucket = var.s3_vault_bucket
-    eip_bastion     = aws_eip.eip_bastion.public_ip
-  }
 }
 
+########################################
+# Userdata init script
+########################################
 data "template_cloudinit_config" "config" {
   gzip          = false
   base64_encode = false
@@ -87,12 +98,15 @@ data "template_cloudinit_config" "config" {
   }
 }
 
+########################################
+# Launch Configuration bastion
+########################################
 resource "aws_launch_configuration" "bastion" {
-  name_prefix          = "lc-${var.env}-${var.service}-${var.role}"
+  name_prefix          = "lc-${var.env}-${var.service}"
   image_id             = var.ami
   instance_type        = var.instance_type
   user_data            = data.template_cloudinit_config.config.rendered
-  key_name             = var.root_keypair
+  # key_name             = var.root_keypair
   iam_instance_profile = aws_iam_instance_profile.bastion-instance-profile.name
   security_groups      = [
     aws_security_group.bastion.id,
@@ -102,9 +116,12 @@ resource "aws_launch_configuration" "bastion" {
   }
 }
 
+########################################
+# ASG bastion
+########################################
 resource "aws_autoscaling_group" "bastion" {
   name                      = replace(aws_launch_configuration.bastion.name, "lc-", "asg-")
-  availability_zones        = var.azs
+  # availability_zones        = var.azs
   desired_capacity          = var.asg_desired_capacity
   min_size                  = var.asg_min_size
   max_size                  = var.asg_max_size
@@ -127,8 +144,7 @@ resource "aws_autoscaling_group" "bastion" {
 
   tags = [
     {
-      key                 = "Name"
-      value               = "${var.service}-${var.role}"
+      Name                 = format("%s-%s", var.env, var.service)
       propagate_at_launch = true
       Service             = var.service
     }
@@ -140,75 +156,15 @@ resource "aws_autoscaling_group" "bastion" {
 
 }
 
+########################################
+# EIP bastion
+########################################
 resource "aws_eip" "eip_bastion" {
   tags = {
     Name    = "bastion-eip"
     Service = var.service
   }
 }
-
-resource "aws_route53_record" "public_dns_bastion" {
-  zone_id = var.aws_route53_zone_public_id
-  name    = var.service
-  type    = "A"
-  ttl     = var.r53_pub_ttl
-  records = [
-    aws_eip.eip_bastion.public_ip]
-}
-
-
-resource "aws_iam_instance_profile" "bastion-instance-profile" {
-  name = "bastion-instance-iam-profile"
-  role = aws_iam_role.bastion-role.name
-}
-
-resource "aws_iam_role" "bastion-role" {
-  name               = "bastion-role"
-  assume_role_policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Action": "sts:AssumeRole",
-            "Principal": {
-               "Service": "ec2.amazonaws.com"
-            },
-            "Effect": "Allow",
-            "Sid": ""
-        }
-    ]
-}
-EOF
-}
-
-resource "aws_iam_role_policy" "read-aws-users" {
-  name   = "${var.service}-read-aws-users"
-  role   = aws_iam_role.bastion-role.id
-  policy = data.aws_iam_policy_document.read-aws-users.json
-}
-
-data "aws_iam_policy_document" "read-aws-users" {
-  statement {
-    actions = [
-      "s3:ListBucket"
-    ]
-
-    resources = [
-      "arn:aws:s3:::${var.s3_vault_bucket}"
-    ]
-  }
-
-  statement {
-    actions = [
-      "s3:GetObject"
-    ]
-
-    resources = [
-      "arn:aws:s3:::${var.s3_vault_bucket}/aws-users.auto.json"
-    ]
-  }
-}
-
 
 resource "aws_iam_role_policy" "attach-eip" {
   name   = "${var.service}-attach-eip"
@@ -229,3 +185,100 @@ data "aws_iam_policy_document" "attach-eip" {
       "*"]
   }
 }
+
+########################################
+# Route53 record bastion
+########################################
+resource "aws_route53_record" "public_dns_bastion" {
+  zone_id = var.aws_route53_zone_public_id
+  name    = var.service
+  type    = "A"
+  ttl     = var.r53_pub_ttl
+  records = [
+    aws_eip.eip_bastion.public_ip]
+}
+
+
+########################################
+# IAM instance profile bastion
+########################################
+resource "aws_iam_instance_profile" "bastion-instance-profile" {
+  name = "bastion-instance-iam-profile"
+  role = aws_iam_role.bastion-role.name
+}
+
+########################################
+# IAM role for bastion
+########################################
+resource "aws_iam_role" "bastion-role" {
+  name               = "bastion-role"
+  # assume_role_policy = aws_iam_policy_document.bastion-role.json
+
+  assume_role_policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": "sts:AssumeRole",
+            "Principal": {
+               "Service": "ec2.amazonaws.com"
+            },
+            "Effect": "Allow",
+            "Sid": ""
+        }
+    ]
+}
+EOF
+}
+
+# resource "aws_iam_role_policy" "bastion-role" {
+#   name   = "${var.service}-bastion-role"
+#   role   = aws_iam_role.bastion-role.id
+#   policy = data.aws_iam_policy_document.bastion-role.json
+# }
+
+# data "aws_iam_policy_document" "bastion-role" {
+#   statement {
+#     actions = [
+#       "sts:AssumeRole"
+#     ]
+#     principals {
+#       type        = "Service"
+#       identifiers = ["ec2.amazonaws.com"]
+#     }
+#     resources = [
+#       "*"
+#     ]
+#   }
+# }
+
+########################################
+# IAM role policy for bastion
+########################################
+# resource "aws_iam_role_policy" "read-aws-users" {
+#   name   = "${var.service}-read-aws-users"
+#   role   = aws_iam_role.bastion-role.id
+#   policy = data.aws_iam_policy_document.read-aws-users.json
+# }
+
+# data "aws_iam_policy_document" "read-aws-users" {
+#   statement {
+#     actions = [
+#       "s3:ListBucket"
+#     ]
+
+#     resources = [
+#       "arn:aws:s3:::${var.s3_vault_bucket}"
+#     ]
+#   }
+
+#   statement {
+#     actions = [
+#       "s3:GetObject"
+#     ]
+
+#     resources = [
+#       "arn:aws:s3:::${var.s3_vault_bucket}/aws-users.auto.json"
+#     ]
+#   }
+# }
