@@ -1,0 +1,6 @@
+---
+apt_dependencies:
+  - python-apt
+
+apt_common_packages: []
+apt_specific_packages: []

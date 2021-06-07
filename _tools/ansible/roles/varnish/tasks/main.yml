@@ -1,0 +1,186 @@
+---
+- name: set the packagecloud repository name based on the version.
+  set_fact:
+    varnish_packagecloud_repo: "varnish{{ varnish_version|replace('.', '') }}"
+
+- name: update all packages to the latest version
+  apt:
+    update-cache: 'yes'
+    upgrade: 'yes'
+
+- name: ensure APT HTTPS transport is installed.
+  apt:
+    name: apt-transport-https
+    state: present
+
+- name: add packagecloud.io Varnish apt key.
+  apt_key:
+    url: https://packagecloud.io/varnishcache/{{ varnish_packagecloud_repo }}/gpgkey
+    state: present
+
+- name: add packagecloud.io Varnish apt repository.
+  apt_repository:
+    repo: "{{ varnish_apt_repo }}"
+    state: present
+
+- name: ensure Varnish is installed.
+  apt:
+    name: "{{ varnish_package_name }}"
+    state: present
+
+- name: ensure old role-managed Varnish systemd unit file is removed.
+  file:
+    path: /etc/systemd/system/varnish.service
+    state: absent
+  when: varnish_systemd_config_path != '/etc/systemd/system'
+
+- name: install varnish vmod-dynamic
+  git:
+    repo: "{{ varnish_vmod_dynamic_repo }}"
+    dest: /tmp/libvmod-dynamic
+    version: "{{ varnish_version }}"
+  when: varnish_vmod_dynamic_enabled
+
+- name: install vmod-dynamic dependencies
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+      - varnish-dev
+      - libgetdns-dev
+      - python-docutils
+      - libtool
+      - automake
+      - make
+      - pkg-config
+      - autotools-dev
+  when: varnish_vmod_dynamic_enabled
+
+- name: setup varnish header files
+  command: ./autogen.sh
+  args:
+    chdir: /tmp/libvmod-dynamic
+  environment:
+    - ACLOCAL_PATH: /usr/share/aclocal
+  when: varnish_vmod_dynamic_enabled
+
+- name: setup pkg-config
+  command: ./configure
+  args:
+    chdir: /tmp/libvmod-dynamic
+  when: varnish_vmod_dynamic_enabled
+
+- name: build varnish vmod-dynamic
+  make:
+    chdir: /tmp/libvmod-dynamic
+  when: varnish_vmod_dynamic_enabled
+
+- name: add line in /etc/hosts for vmod-dynamic
+  lineinfile:
+    dest: /etc/hosts
+    line: "127.0.0.1 www.localhost img.localhost"
+    state: present
+  when: varnish_vmod_dynamic_enabled and varnish_vmod_dynamic_tests
+
+- name: check varnish vmod-dynamic
+  make:
+    chdir: /tmp/libvmod-dynamic
+    target: check
+  when: varnish_vmod_dynamic_enabled and varnish_vmod_dynamic_tests
+
+- name: install varnish vmod-dynamic
+  make:
+    chdir: /tmp/libvmod-dynamic
+    target: install
+  when: varnish_vmod_dynamic_enabled
+
+- name: ensure Varnish config path exists.
+  file:
+    path: "{{ varnish_config_path }}"
+    state: directory
+
+- name: copy Varnish configuration (sysvinit).
+  template:
+    src: varnish.j2
+    dest: "{{ varnish_sysvinit_config_path }}/varnish"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: copy Debian Jessie/Xenial specific Varnish configs (systemd).
+  template:
+    src: varnish.service.j2
+    dest: "{{ varnish_systemd_config_path }}/varnish.service"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - reload systemd
+    - restart varnish
+
+- name: copy Varnish configuration (systemd).
+  template:
+    src: varnish.params.j2
+    dest: "{{ varnish_config_path }}/varnish.params"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: make sure gomplates directory exists
+  file:
+    path: "{{ varnish_gomplates_path }}"
+    state: directory
+
+- name: copy Varnish default VCL.
+  template:
+    src: "{{ varnish_default_vcl_template_path }}"
+    dest: "{{ varnish_gomplates_path }}/default.vcl"
+    owner: root
+    group: root
+    mode: 0644
+  when: varnish_use_default_vcl | bool
+  notify: restart varnish
+
+- name: copy Varnish cluster includes
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ varnish_gomplates_path }}/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - include.nodes_init.vcl
+    - include.nodes.vcl
+  when: varnish_cluster is defined
+  notify: restart varnish
+
+- name: copy Varnish dynamic_dns includes
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ varnish_gomplates_path }}/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - include.dynamic_dns.vcl
+  when: varnish_vmod_dynamic_enabled
+  notify: restart varnish
+
+- name: copy varnish secret.
+  template:
+    src: secret.j2
+    dest: "{{ varnish_config_path }}/secret"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart varnish
+
+- name: ensure Varnish services are started enabled on startup
+  service:
+    name: "{{ item }}"
+    state: "{{ varnish_services_state }}"
+    enabled: "{{ varnish_services_enabled }}"
+    use: "service"
+  with_items: "{{ varnish_enabled_services | default([]) }}"
+  when:
+    - varnish_enabled_services | bool

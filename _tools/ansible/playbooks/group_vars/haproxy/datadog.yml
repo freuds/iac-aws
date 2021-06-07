@@ -1,0 +1,35 @@
+# datadog-agent
+datadog_additional_groups:
+  - adm
+datadog_config:
+  api_key: '__DATADOG_API_KEY__'
+  tags:
+    - "environment:__DATADOG_TAG_ENV__"
+    - "role:haproxy"
+  log_level: INFO
+  logs_enabled: "true"
+  logs_config:
+    use_http: "true"
+    use_compression: "true"
+  process_config:
+    enabled: "true"
+    strip_proc_arguments: "false"
+  apm_config:
+    enabled: "false"
+datadog_checks:
+  haproxy:
+    init_config:
+    instances:
+      - url: http://__HAPROXY_STATS_ADDRESS__:__HAPROXY_STATS_PORT__/admin?stats
+        port: "__HAPROXY_STATS_PORT__"
+        username: "__HAPROXY_STATS_USER__"
+        password: "__HAPROXY_STATS_PWD__"
+    logs:
+      - type: file
+        path: /var/log/haproxy/haproxy*.log
+        service: haproxy
+        source: haproxy
+        log_processing_rules:
+          - type: exclude_at_match
+            name: exclude_admin_stats
+            pattern: \W+__HAPROXY_STATS_ADDRESS__:__HAPROXY_STATS_PORT__

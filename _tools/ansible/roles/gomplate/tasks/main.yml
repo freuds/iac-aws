@@ -1,0 +1,11 @@
+---
+  - name: get gomplate from url
+    get_url:
+      url: '{{ gomplate_binary_download_url }}'
+      dest: '{{ gomplate_binary_install_path }}'
+      mode: '0755'
+  
+  - name: check gomplate install
+    shell: gomplate --help
+    register: gomplate_usage
+    failed_when: gomplate_usage.rc > 1

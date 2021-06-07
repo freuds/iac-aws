@@ -1,0 +1,5 @@
+---
+- name: attach-eip scripts
+  copy: src={{ item }} dest=/opt/{{ item }} mode=755
+  with_items:
+    - attach_eip.sh

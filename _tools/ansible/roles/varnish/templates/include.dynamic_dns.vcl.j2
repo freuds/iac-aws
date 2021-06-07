@@ -1,0 +1,7 @@
+# Add director for dynamic dns resolution
+new ddir = dynamic.director(
+    port = "80",
+    # The DNS resolution is done in the background,
+    # see https://github.com/nigoroll/libvmod-dynamic/blob/master/src/vmod_dynamic.vcc#L48
+    ttl = 10s,
+);

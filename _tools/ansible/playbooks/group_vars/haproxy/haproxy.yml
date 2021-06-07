@@ -1,0 +1,91 @@
+---
+haproxy_version: 2.1
+haproxy_daemon_state: stopped
+haproxy_daemon_enabled: no
+haproxy_nb_proc: '__HAPROXY_NB_PROC__'
+haproxy_cpu_map: '__HAPROXY_CPU_MAP__'
+haproxy_logs_enabled: true
+haproxy_unique_id_header: X-PHENIX-TRACE-ID
+haproxy_global_vars:
+  - 'ca-base /etc/ssl/certs'
+  - 'crt-base /etc/ssl/private'
+  - 'ssl-default-bind-ciphersuites TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256'
+  - 'ssl-default-bind-options ssl-min-ver TLSv1.2 no-tls-tickets'
+  - 'ssl-default-server-ciphersuites TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256'
+  - 'ssl-default-server-options ssl-min-ver TLSv1.2 no-tls-tickets'
+  - 'tune.ssl.default-dh-param 2048'
+haproxy_resolvers:
+  - name: 'aws-resolver'
+    fqdn: '__AWS_RESOLVER_IP__'
+    port: 53
+    resolve_retries: 30
+    resolve_retry_timeout: '1s'
+    resolve_hold_valid: '10s'
+haproxy_userlists:
+  - name: 'phenix_users'
+    user: 'phenix'
+    password: 'b4o/FoDV'
+haproxy_frontends:
+  - name: 'http'
+    bind_address: '*'
+    bind_port: 80
+    mode: 'http'
+    options: []
+    acls:
+      - name: 'acl-is-root'
+        rule: 'path -i /'
+      - name: 'acl-forwarded-http'
+        rule: 'hdr_reg(x-forwarded-proto) -i ^http$'
+      - name: 'acl-origin'
+        rule: 'hdr_reg(host) -i ^[^\.]*\-origin[\.a-z]*\.wearephenix.com\.[\.a-z]*$'
+      - name: 'acl-apex-com'
+        rule: 'hdr_reg(host) -i ^[^\.]*\.wearephenix\.com$'
+      - name: 'acl-admin'
+        rule: 'hdr_reg(host) -i ^admin[^\.]*[\.a-z]*\.wearephenix\.com$'
+      - name: 'acl-api'
+        rule: 'hdr_reg(host) -i ^api[^\.]*[\.a-z]*\.wearephenix\.com$'
+      - name: 'acl-webapp'
+        rule: 'hdr_reg(host) -i ^webapp[^\.]*[\.a-z]*\.wearephenix\.com$'
+      - name: 'acl-app'
+        rule: 'hdr_reg(host) -i ^app[^\.]*[\.a-z]*\.wearephenix\.com$'
+    http_basic_auth:
+      - user_list: 'phenix_users'
+        realm: 'Phenix HTTP Auth'
+    default_backend: 'eks-ingress'
+    captures:
+      - name: 'request header X-Forwarded-For'
+        length: '64'
+      - name: 'request header X-Amzn-Trace-Id'
+        length: '256'
+      - name: 'request header X-Amzn-RequestId'
+        length: '128'
+      - name: 'request header Host'
+        length: '64'
+      - name: 'request header User-Agent'
+        length: '128'
+      - name: 'request header Origin'
+        length: '64'
+      - name: 'request header Referer'
+        length: '256'
+    set_paths:
+      - path: '/api%[path]'
+        condition: 'acl-api'
+    replace_values:
+      - header: 'Host'
+        match_regexp: '^api.(.*)'
+        replace_format: 'app.\1'
+        condition: 'acl-api'
+    use_backends:
+      - 'eks-ingress if acl-admin || acl-webapp || acl-api'
+haproxy_backends:
+  - name: 'eks-ingress'
+    mode: 'http'
+    add_headers:
+      - header: 'x-phenix-trace-id'
+        value: '%ID'
+    servers:
+      - name: 'eks-internal-lb'
+        fqdn: '__EKS_INTERNAL_LB_FQDN__'
+        port: '80'
+        resolver: 'aws-resolver'
+

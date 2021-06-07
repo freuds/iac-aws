@@ -1,0 +1,20 @@
+---
+- name: awscli dependencies
+  apt:
+    name: ["python", "unzip"]
+    state: present
+
+- name: awscli download
+  get_url:
+    url: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
+    dest: /tmp/awscliv2.zip
+    mode: 0600
+
+- name: awscli unarchive
+  unarchive:
+    remote_src: yes
+    src: /tmp/awscliv2.zip
+    dest: /tmp
+
+- name: awscli install
+  command: /tmp/aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
