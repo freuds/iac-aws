@@ -1,0 +1,14 @@
+- hosts: haproxy
+  become: true
+  become_method: sudo
+  become_user: root
+  remote_user: "{{ ansible_user | default('ubuntu') }}"
+  roles:
+    - apt
+    - authorized-keys
+    - aws-cli
+    - gomplate
+    - haproxy
+    - datadog
+  vars:
+    service_name: "{{ SERVICE }}"

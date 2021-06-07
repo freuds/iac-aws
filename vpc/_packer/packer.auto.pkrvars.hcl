@@ -1,0 +1,5 @@
+template = "debian-buster"
+role = "server"
+service = "bastion"
+inventory_groups = "bastion"
+playbook_file = "../../_tools/ansible/playbooks/bastion.yml"

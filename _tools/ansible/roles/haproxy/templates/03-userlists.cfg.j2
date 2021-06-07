@@ -1,0 +1,4 @@
+# HAProxy userlists {{ item.name }}
+# {{ ansible_managed }}
+userlist {{ item.name }}
+    user {{ item.user }} insecure-password {{ item.password }}

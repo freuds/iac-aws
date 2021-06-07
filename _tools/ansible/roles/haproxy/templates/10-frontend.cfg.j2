@@ -1,0 +1,134 @@
+# HAProxy frontend {{ item.name }}
+# {{ ansible_managed }}
+frontend {{ item.name }}
+{% for option in item.options %}
+    option {{ option }}
+{% endfor %}
+    bind {{ item.bind_address }}:{{ item.bind_port }}{{ (' ' + (item.ssl_params | join(' '))) if item.ssl_params is defined else '' }}
+{% if item.ssl_params is defined %}
+    # SSL Optimizations
+    #
+    # Distinguish between secure and insecure requests
+    acl secure dst_port eq 443
+
+    # Mark all cookies as secure if sent over SSL
+{% if haproxy_version >= 2 %}
+    http-response replace-header Set-Cookie (.*) \1;\ Secure if secure
+{% else %}
+    rsprep ^Set-Cookie:\ (.*) Set-Cookie:\ \1;\ Secure if secure
+{% endif %}
+
+    # Add the HSTS Header with a one year max-age
+    # See: https://scotthel.me/pineapplesslstrip
+{% if haproxy_version >= 2 %}
+    http-response add-header Strict-Transport-Security max-age={{ item.hsts_max_age | default('31536000') }};\ includeSubDomains;\ preload; if secure
+{% else %}
+    rspadd Strict-Transport-Security:\ max-age={{ item.hsts_max_age | default('31536000') }};\ includeSubDomains;\ preload; if secure
+{% endif %}
+
+    # Set X-Frame-Options Header to DENY
+    # Prevents clickjacking attacks by preventing our content from being embedded in <frame> or <iframe>
+    # See OWASP Guidelines: https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Clickjacking_Defense_Cheat_Sheet.md
+{% if haproxy_version >= 2 %}
+    http-response add-header X-Frame-Options SAMEORIGIN
+{% else %}
+    rspadd X-Frame-Options:\ SAMEORIGIN
+{% endif %}
+
+    # Set X-XSS-Protection Header
+    # Do not render document if XSS is found
+    # See: https://blogs.msdn.microsoft.com/ie/2008/07/02/ie8-security-part-iv-the-xss-filter/
+{% if haproxy_version >= 2 %}
+    http-response add-header X-XSS-Protection 1;\ mode=block
+{% else %}
+    rspadd X-XSS-Protection:\ 1;\ mode=block
+{% endif %}
+
+    # Set X-Content-Type-Options Header
+    # Avoid MIME-Sniffing attacks
+{% if haproxy_version >= 2 %}
+    http-response add-header X-Content-Type-Options nosniff
+{% else %}
+    rspadd X-Content-Type-Options:\ nosniff
+{% endif %}
+
+    # Set Referrer-Policy Header
+    # Avoid Revealing HTTPS URLs When Navigating Away to HTTP Sites
+    # See: https://scotthelme.co.uk/a-new-security-header-referrer-policy/
+{% if haproxy_version >= 2 %}
+    http-response add-header Referrer-Policy no-referrer-when-downgrade
+{% else %}
+    rspadd Referrer-Policy:\ no-referrer-when-downgrade
+{% endif %}
+
+    # TODO: Implement Content-Security-Policy countermeasure
+    # See: https://scotthelme.co.uk/content-security-policy-an-introduction/
+
+    # Set X-Forwarded-Proto Header accordingly
+{% if haproxy_version >= 2 %}
+    http-response add-header X-Forwarded-Proto https if secure
+{% else %}
+    rspadd X-Forwarded-Proto:\ https if secure
+{% endif %}
+
+{% endif %}
+
+    # Capture Headers
+{% if item.captures is defined %}
+{% for capture in item.captures %}
+    capture {{ capture.name }} len {{ capture.length }}
+{% endfor %}
+{% endif %}
+
+    # Default Backend
+{% if item.default_backend is defined %}
+    default_backend {{ item.default_backend }}
+{% endif %}
+{% if item.force_https is defined and item.force_https %}
+    redirect scheme https code 301 if !{ ssl_fc acl-http }
+{% endif %}
+
+    # ACLs rules
+{% for acl in item.acls %}
+    acl {{ acl.name }} {{ acl.rule }}
+{% endfor %}
+
+{% if item.http_basic_auth is defined %}
+    # Basic Authentication
+{% for http_basic in item.http_basic_auth %}
+    acl {{ http_basic.user_list }} http_auth({{ http_basic.user_list }})
+    http-request auth realm '{{ http_basic.realm }}' if !{{ http_basic.user_list }}
+{% endfor %}
+{% endif %}
+{% if item.add_headers is defined %}
+    # Set Headers
+{% for add_header in item.add_headers %}
+    http-request set-header {{ add_header.header }} {{ add_header.value }}
+{% endfor %}
+{% endif %}
+{% if item.redirects is defined %}
+
+    # Redirections
+{% for redirect in item.redirects %}
+    http-request redirect code {{ redirect.code }}{{(' location ' + redirect.location) if redirect.location is defined else '' }}{{(' scheme ' + redirect.scheme) if redirect.scheme is defined else '' }} if {{ redirect.condition }}
+{% endfor %}
+{% endif %}
+{% if item.set_paths is defined %}
+
+    # Path rewrites
+{% for set_path in item.set_paths %}
+    http-request set-path {{ set_path.path }} {{('if ' + set_path.condition) if set_path.condition is defined else '' }}
+{% endfor %}
+{% endif %}
+{% if item.replace_values is defined %}
+
+    # Replacements
+{% for replace in item.replace_values %}
+    http-request replace-value {{ replace.header  }} {{ replace.match_regexp }} {{ replace.replace_format }} if {{ replace.condition }}
+{% endfor %}
+{% endif %}
+
+    # backends declarations
+{% for use_backend in item.use_backends %}
+    use_backend {{ use_backend }}
+{% endfor %}

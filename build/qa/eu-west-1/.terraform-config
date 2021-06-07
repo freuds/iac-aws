@@ -1,0 +1,3 @@
+workspaces {
+    name = "build-qa-eu-west-1"
+}

@@ -1,0 +1,13 @@
+- hosts: bastion
+  become: true
+  become_method: sudo
+  become_user: root
+  remote_user: "{{ ansible_user | default('debian') }}"
+  roles:
+    - apt
+    - authorized-keys
+    - aws-cli
+    - attach-eip
+    - dehydrated
+  vars:
+    service_name: "{{ SERVICE }}"

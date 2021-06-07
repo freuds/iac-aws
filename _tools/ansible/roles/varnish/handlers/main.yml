@@ -1,0 +1,8 @@
+---
+- name: reload systemd
+  systemd: daemon-reload=true
+  when: ansible_connection != 'local'
+
+- name: restart varnish
+  service: name=varnish state=restarted
+  when: ansible_connection != 'local'

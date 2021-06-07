@@ -1,0 +1,23 @@
+# datadog-agent
+datadog_additional_groups:
+  - adm
+datadog_config:
+  api_key: '__DATADOG_API_KEY__'
+  tags:
+    - "environment:__DATADOG_TAG_ENV__"
+    - "role:varnish"
+  log_level: INFO
+  logs_enabled: "true"
+  logs_config:
+    use_http: "true"
+    use_compression: "true"
+  process_config:
+    enabled: "true"
+    strip_proc_arguments: "false"
+  apm_config:
+    enabled: "false"
+datadog_checks:
+  varnish:
+    init_config:
+    instances:
+      - varnishstat: /usr/bin/varnishstat

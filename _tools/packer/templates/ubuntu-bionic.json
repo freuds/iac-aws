@@ -1,0 +1,119 @@
+{
+  "variables": {
+    "role": null,
+    "service": null,
+    "playbook_file": null,
+    "inventory_groups": null,
+    "region": "eu-west-1",
+    "aws_profile": "revolve",
+    "vpc_id": "vpc-0943350383762ea0c",
+    "subnet_id": "subnet-0d969f189aad02f1a",
+    "security_group_id": "sg-0cedabc8df636164f",
+    "source_ami": "ami-0964eb2dc8b836eb6",
+    "instance_type": "t3.micro",
+    "shared_account": "205168111441,432161212492",
+    "box_name": "generic/ubuntu1804",
+    "box_version": "3.0.14",
+    "box_folder": "undefined",
+    "box_checksum": "undefined",
+    "box_base_mac": "undefined",
+    "vagrant_ssh_private_key": "undefined",
+    "PROJECT_NAME": "IAC-AWS",
+    "PROJECT_ENV": "QA",
+    "PROJECT_OWNER": "frederic.willien@revolve.team",
+    "PROJECT_GIT": "https://github.com/freuds/iac-aws.git",
+    "PROJECT_CI": ""
+    
+  },
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "region": "{{ user `region` }}",
+      "source_ami": "{{ user `source_ami` }}",
+      "instance_type": "{{ user `instance_type` }}",
+      "ssh_pty": true,
+      "ssh_username": "ubuntu",
+      "ami_name": "{{ user `service` }}-{{ user `role` }}-{{ isotime \"2006-01-02T15-04-05\" }}",
+      "ami_description": "ubuntu-{{ user `service` }}-{{ user `role` }}",
+      "ami_regions": ["eu-west-1"],
+      "vpc_id": "{{ user `vpc_id` }}",
+      "subnet_id": "{{ user `subnet_id` }}",
+      "ami_users": "{{ user `shared_account` }}",
+      "associate_public_ip_address": true,
+      "security_group_id": "{{ user `security_group_id` }}",
+      "tags": {
+        "Name": "{{ user `service` }}-{{ user `role` }}",
+        "Role": "{{ user `role` }}",
+        "Service": "{{ user `service` }}",
+        "Source AMI":"{{ user `source_ami` }}",
+        "Appli": "{{user `PROJECT_NAME`}}",
+        "owner": "{{user `PROJECT_OWNER`}}",
+        "Env": "{{user `PROJECT_ENV`}}",
+        "git": "{{user `PROJECT_GIT`}}",
+        "ci": "{{user `PROJECT_CI`}}"
+      },
+      "run_tags": {
+        "Name": "Packer Builder {{ user `service` }}",
+        "Appli": "{{user `PROJECT_NAME`}}",
+        "owner": "{{user `PROJECT_OWNER`}}",
+        "Env": "{{user `PROJECT_ENV`}}",
+        "git": "{{user `PROJECT_GIT`}}",
+        "ci": "{{user `PROJECT_CI`}}"
+      }
+    },
+    {
+      "type": "virtualbox-ovf",
+      "communicator": "ssh",
+      "source_path": "{{ user `box_folder` }}/box.ovf",
+      "checksum": "{{ user `box_checksum` }}",
+      "guest_additions_mode": "disable",
+      "headless": true,
+      "ssh_pty": true,
+      "ssh_username": "vagrant",
+      "ssh_private_key_file": "~/.vagrant.d/insecure_private_key",
+      "ssh_port": "62222",
+      "ssh_wait_timeout": "1000s",
+      "ssh_skip_nat_mapping": true,
+      "shutdown_command": "sudo shutdown -P now",
+      "output_directory": "/tmp/packer_output",
+      "target_path": "/tmp/packer_cache",
+      "skip_export": true,
+      "vboxmanage": [
+        [ "modifyvm", "{{ .Name }}", "--cpus", "2" ],
+        [ "modifyvm", "{{ .Name }}", "--memory", "2048" ],
+        [ "modifyvm", "{{ .Name }}", "--nic1", "nat" ],
+        [ "modifyvm", "{{ .Name }}", "--natpf1", "packerssh,tcp,127.0.0.1,62222,,22" ],
+        [ "modifyvm", "{{ .Name }}", "--uart1", "0x3F8", "4" ],
+        [ "modifyvm", "{{ .Name }}", "--macaddress1", "{{ user `box_base_mac` }}" ],
+        [ "modifyvm", "{{ .Name }}", "--accelerate3d", "off" ],
+        [ "modifyvm", "{{ .Name }}", "--graphicscontroller", "vmsvga" ],
+        [ "modifyvm", "{{ .Name }}", "--pae", "off" ],
+        [ "modifyvm", "{{ .Name }}", "--nestedpaging", "on" ],
+        [ "modifyvm", "{{ .Name }}", "--vram", "128" ]
+      ]
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": ["sleep 20"],
+      "only": ["amazon-ebs"]
+    },
+    {
+      "type": "shell",
+      "scripts": ["{{ template_dir }}/../scripts/bootstrap.sh"]
+    },
+    {
+      "type": "ansible-local",
+      "playbook_file": "{{ user `playbook_file` }}",
+      "playbook_dir": "{{ template_dir }}/../../ansible",
+      "group_vars": "{{ template_dir }}/../../ansible/playbooks/group_vars",
+      "inventory_groups": "{{ user `inventory_groups` }}",
+      "extra_arguments": [ "--extra-vars \"SERVICE={{ user `service` }}\"", "-e ansible_python_interpreter=/usr/bin/python3" ]
+    },
+    {
+      "type": "shell",
+      "scripts": ["{{ template_dir }}/../scripts/cleanup.sh"]
+    }
+  ]
+}

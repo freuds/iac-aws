@@ -1,0 +1,31 @@
+---
+- name: haproxy log directory
+  file:
+    path: /var/log/haproxy
+    owner: '{{ haproxy_log_owner }}'
+    group: adm
+    state: directory
+    mode: 0755
+
+- name: haproxy log files
+  file:
+    path: '{{ item }}'
+    owner: '{{ haproxy_log_owner }}'
+    group: adm
+    state: touch
+  with_items:
+    - /var/log/haproxy/haproxy.access.log
+    - /var/log/haproxy/haproxy.events.log
+
+- name: haproxy rsyslog conf
+  template:
+    src: '{{ item }}.j2'
+    dest: '/etc/rsyslog.d/{{ item }}'
+  with_items:
+    - 49-haproxy.conf
+  notify: restart rsyslog
+
+- name: haproxy logrotate
+  template:
+    src: haproxy.logrotate.j2
+    dest: /etc/logrotate.d/haproxy
