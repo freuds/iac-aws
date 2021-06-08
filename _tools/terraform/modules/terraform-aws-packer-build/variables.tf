@@ -34,3 +34,8 @@ variable "trusted_networks" {
   type = list(string)
   default = ["0.0.0.0/0"]
 }
+
+variable "s3_endpoint_enabled" {
+  type = bool
+  default = false
+}

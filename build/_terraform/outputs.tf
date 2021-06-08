@@ -7,5 +7,5 @@ output "public_subnets" {
 }
 
 output "security_group_public_subnet" {
-  value = module.build.sg_public_subnet
+  value = module.build.security_group_public_subnet
 }

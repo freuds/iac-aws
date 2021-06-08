@@ -48,18 +48,26 @@ resource "aws_route_table_association" "rtap" {
 
 # Declare the data source
 data "aws_vpc_endpoint_service" "s3" {
-  service = "s3"
+  count        = var.s3_endpoint_enabled ? 1 : 0
+  service      = "s3"
+  service_type = "Gateway"
 }
 
 # Create a VPC endpoint
 resource "aws_vpc_endpoint" "s3" {
+  count        = var.s3_endpoint_enabled ? 1 : 0
   vpc_id       = aws_vpc.build.id
-  service_name = data.aws_vpc_endpoint_service.s3.service_name
+  service_name = data.aws_vpc_endpoint_service.s3[count.index].service_name
+  tags   = {
+    Name  = "build-s3-endpoint"
+    Stack = "build"
+  }
 }
 
 # Associate VPC endpoint with route table a
 resource "aws_vpc_endpoint_route_table_association" "s3-rt-public" {
-  vpc_endpoint_id = aws_vpc_endpoint.s3.id
+  count           = var.s3_endpoint_enabled ? 1 : 0
+  vpc_endpoint_id = aws_vpc_endpoint.s3[count.index].id
   route_table_id  = aws_route_table.public.id
 }
 
