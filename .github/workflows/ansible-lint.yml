@@ -13,7 +13,9 @@ jobs:
 
     - name: Lint Ansible Playbook
       # replace "master" with any valid ref
-      uses: ansible/ansible-lint-action@v4.1.0
+      uses: ansible/ansible-lint-action@v4.1.0.post0
+      env:
+        ACTION_PLAYBOOK_NAME: bastion.yml
       with:
         # [required]
         # Paths to ansible files (i.e., playbooks, tasks, handlers etc..)
