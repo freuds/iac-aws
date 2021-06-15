@@ -19,11 +19,6 @@ jobs:
     name: 'Terraform'
     runs-on: ubuntu-latest
     environment: qa
-  
-    defaults:
-    run:
-      shell: bash
-      working-directory: vpc/qa/eu-ewst-1
 
     steps:
     - uses: actions/checkout@v2
