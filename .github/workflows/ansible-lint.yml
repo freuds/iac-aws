@@ -17,8 +17,6 @@ jobs:
     steps:
     # Important: This sets up your GITHUB_WORKSPACE environment variable
     - uses: actions/checkout@v2
-
-    - name: Move in Ansible workdir
       working-directory: _tools/ansible
 
     - name: Lint Ansible Playbook
