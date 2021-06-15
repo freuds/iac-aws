@@ -19,7 +19,12 @@ jobs:
     name: 'Terraform'
     runs-on: ubuntu-latest
     environment: qa
-    
+  
+    defaults:
+    run:
+      shell: bash
+      working-directory: vpc/qa/eu-ewst-1
+
     steps:
     - uses: actions/checkout@v2
     - uses: hashicorp/setup-terraform@v1
@@ -29,7 +34,6 @@ jobs:
 
     - name: Terraform CI
       run: |
-        cd vpc/qa/eu-ewst-1
         make init
 
     # make init
