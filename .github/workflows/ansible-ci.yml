@@ -1,8 +1,4 @@
-name: Ansible Linte
-
-# on: [
-#   push,
-#   pull_request]
+name: Ansible Molecule
 
 on:
   push:
@@ -14,14 +10,11 @@ on:
     branches:
     - main
 
-# environment:
-#   GITHUB_WORKSPACE:
-
 jobs:
-
-  test:
+  ansible:
     name: Molecule aws-cli role
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
         distro:
@@ -40,9 +33,10 @@ jobs:
       - name: Install test dependencies.
         run: pip3 install molecule docker yamllint ansible ansible-lint 'molecule[docker]'
 
-      - name: Run Molecule tests for aws-cli role
-        run: molecule test
-        working-directory: _tools/ansible/roles/aws-cli
+      - name: Run Molecule tests ansible role
+        run: |
+          cd _tools/ansible/roles/aws-cli
+          molecule test
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
