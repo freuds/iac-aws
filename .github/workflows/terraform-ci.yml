@@ -2,32 +2,24 @@
 
 name: Terraform VPC
 
-on:
-  push:
-    branches:
-    - main
-    paths:
-    - 'vpc/**'
-    - '_tools/terraform/modules/**'
-  pull_request:
-    branches:
-    - main
+on: [push, pull_request]
+# on:
+#   push:
+#     branches:
+#     - main
+#     paths:
+#     - 'vpc/**'
+#     - '_tools/terraform/modules/**'
+#   pull_request:
+#     branches:
+#     - main
 
 jobs:
   terraform:
     name: 'Terraform'
     runs-on: ubuntu-latest
-
     environment: qa
     
-    env:
-      service: vpc
-      region: eu-west-1
-
-    defaults:
-      run:
-        shell: bash
-
     steps:
     - uses: actions/checkout@v2
     - uses: hashicorp/setup-terraform@v1
@@ -37,7 +29,8 @@ jobs:
 
     - name: Terraform CI
       run: |
-        cd ${{ service }}/${{ environment }}/${{ region }}
+        cd vpc/qa/eu-ewst-1
+        make init
 
     # make init
     # terraform init
