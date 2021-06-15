@@ -1,0 +1,6 @@
+---
+AWSCLI_OS: linux
+AWSCLI_URL: https://awscli.amazonaws.com/awscli-exe-{{ AWSCLI_OS }}
+
+BINARY_DIR: /usr/local/bin
+INSTALL_DIR: /usr/local/aws-cli

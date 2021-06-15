@@ -1,0 +1,17 @@
+---
+# This is an example playbook to execute Ansible tests.
+
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+
+  - name: Launch aws version
+    command: /usr/local/bin/aws --version
+    ignore_errors: yes
+    register: result
+
+  - name: Check aws version
+    assert:
+      that:
+        - result.stdout is regex("aws-cli/\w+")
