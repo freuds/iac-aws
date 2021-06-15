@@ -11,8 +11,8 @@ on:
     - main
 
 jobs:
-  ansible:
-    name: Molecule aws-cli role
+  aws-cli:
+    name: aws-cli role
     runs-on: ubuntu-latest
 
     strategy:
@@ -20,7 +20,7 @@ jobs:
         distro:
           - centos8
           - debian10
-
+        
     steps:
       - name: Check out the codebase.
         uses: actions/checkout@v2
@@ -34,9 +34,7 @@ jobs:
         run: pip3 install molecule docker yamllint ansible ansible-lint 'molecule[docker]'
 
       - name: Run Molecule tests ansible role
-        run: |
-          cd _tools/ansible/roles/aws-cli
-          molecule test
+        run: cd _tools/ansible/roles/aws-cli && molecule test
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
