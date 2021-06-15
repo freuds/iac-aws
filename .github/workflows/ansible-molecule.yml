@@ -8,7 +8,7 @@ on: [push, pull_request]
 jobs:
 
   test:
-    name: Molecule
+    name: Molecule AWScli
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -28,7 +28,7 @@ jobs:
       - name: Install test dependencies.
         run: pip3 install molecule docker yamllint ansible ansible-lint 'molecule[docker]'
 
-      - name: Run Molecule tests.
+      - name: Run Molecule tests for aws-cli role
         run: molecule test
         working-directory: _tools/ansible/roles/aws-cli
         env:
