@@ -8,7 +8,7 @@ on: [push, pull_request]
 jobs:
 
   test:
-    name: Molecule AWScli
+    name: Molecule aws-cli role
     runs-on: ubuntu-latest
     strategy:
       matrix:
