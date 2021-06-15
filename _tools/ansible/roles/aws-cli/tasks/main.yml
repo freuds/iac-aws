@@ -1,12 +1,26 @@
 ---
-- name: awscli dependencies
-  apt:
-    name: ["python", "unzip"]
+- name: AWSCli dependencies
+  package:
+    name: ["python3", "unzip"]
     state: present
+
+- name: Create URL for ARM64
+  set_fact:
+    url_download: "{{ AWSCLI_URL }}-aarch64.zip"
+  when: ansible_architecture == 'arm64'
+
+- name: Create URL for x86_64
+  set_fact:
+    url_download: "{{ AWSCLI_URL }}-x86_64.zip"
+  when: ansible_architecture == 'x86_64'
+
+- name: Debug
+  debug:
+    msg: "{{ url_download }}"
 
 - name: awscli download
   get_url:
-    url: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
+    url: "{{ url_download }}"
     dest: /tmp/awscliv2.zip
     mode: 0600
 
@@ -17,4 +31,5 @@
     dest: /tmp
 
 - name: awscli install
-  command: /tmp/aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
+  command: /tmp/aws/install --bin-dir {{ BINARY_DIR }} --install-dir {{ INSTALL_DIR }} --update
+  changed_when: false
