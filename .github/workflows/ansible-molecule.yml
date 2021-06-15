@@ -1,0 +1,37 @@
+name: Ansible Linte
+
+on: [push, pull_request]
+
+# environment:
+#   GITHUB_WORKSPACE:
+
+jobs:
+
+  test:
+    name: Molecule
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        distro:
+          - centos8
+          - debian10
+
+    steps:
+      - name: Check out the codebase.
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3.
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install test dependencies.
+        run: pip3 install molecule docker yamllint ansible ansible-lint 'molecule[docker]'
+
+      - name: Run Molecule tests.
+        run: molecule test
+        working-directory: _tools/ansible/roles/aws-cli
+        env:
+          PY_COLORS: '1'
+          ANSIBLE_FORCE_COLOR: '1'
+          MOLECULE_DISTRO: ${{ matrix.distro }}
