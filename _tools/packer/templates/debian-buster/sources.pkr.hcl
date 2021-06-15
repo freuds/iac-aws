@@ -41,52 +41,62 @@ source "amazon-ebs" "debian" {
   }
 }
 
+    // "<enter><wait><f6><wait><esc><wait>",
+    // "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+    // "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+    // "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+    // "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+    // "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+    // "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+    // "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+    // "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+    // "<bs><bs><bs>",
+    // "/install/vmlinuz noapic ",
+    // "file=/floppy/preseed.cfg ",
+    // "debian-installer=en_US auto locale=en_US kbd-chooser/method=us ",
+    // "hostname=vagrant ",
+    // "fb=false debconf/frontend=noninteractive ",
+    // "keyboard-configuration/modelcode=SKIP ",
+    // "keyboard-configuration/layout=USA ",
+    // "keyboard-configuration/variant=USA console-setup/ask_detect=false ",
+    // "passwd/user-fullname=vagrant ",
+    // "passwd/user-password=vagrant ",
+    // "passwd/user-password-again=vagrant ",
+    // "passwd/username=vagrant ",
+    // "initrd=/install/initrd.gz -- <enter>"
+
 source "qemu" "ubuntu" {
     boot_command      = [
-    "<enter><wait><f6><wait><esc><wait>",
-    "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
-    "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
-    "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
-    "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
-    "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
-    "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
-    "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
-    "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
-    "<bs><bs><bs>",
-    "/install/vmlinuz noapic ",
-    "file=/floppy/preseed.cfg ",
-    "debian-installer=en_US auto locale=en_US kbd-chooser/method=us ",
-    "hostname=vagrant ",
-    "fb=false debconf/frontend=noninteractive ",
-    "keyboard-configuration/modelcode=SKIP ",
-    "keyboard-configuration/layout=USA ",
-    "keyboard-configuration/variant=USA console-setup/ask_detect=false ",
-    "passwd/user-fullname=vagrant ",
-    "passwd/user-password=vagrant ",
-    "passwd/user-password-again=vagrant ",
-    "passwd/username=vagrant ",
-    "initrd=/install/initrd.gz -- <enter>"
+      "<esc><esc><enter><wait>",
+      "/install/vmlinuz noapic ",
+      "preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg ",
+      "debian-installer=en_US auto locale=en_US kbd-chooser/method=us ",
+      "hostname={{ .Name }} ",
+      "fb=false debconf/frontend=noninteractive ",
+      "keyboard-configuration/modelcode=SKIP keyboard-configuration/layout=USA ",
+      "keyboard-configuration/variant=USA console-setup/ask_detect=false ",
+      "initrd=/install/initrd.gz -- <enter>"
   ]
-  floppy_files      = ["../../_tools/packer/templates/debian-buster/http/preseed.cfg"]
+  // floppy_files      = ["../../_tools/packer/templates/debian-buster/http/preseed.cfg"]
   boot_wait         = "1800s"
   disk_interface    = "virtio"
   disk_size         = 6000
   format            = "qcow2"
   headless          = true
-  // http_directory    = "httpdir"
+  http_directory    = "../../_tools/packer/templates/debian-buster/http"
   // http_port_max     = 10089
   // http_port_min     = 10082
   iso_urls           = [
-    "http://cdimage.ubuntu.com/releases/18.04.5/release/ubuntu-18.04.5-server-amd64.iso"
+    "http://cdimage.ubuntu.com/releases/bionic/release/ubuntu-18.04.5-server-arm64.iso"
   ]
-  iso_checksum = "8c5fc24894394035402f66f3824beb7234b757dd2b5531379cb310cedfdf0996"
+  iso_checksum = "2cd7742c91bbb325622e8314500106cfa1074fcf5a6a380e8878bbbb9974e9f3"
   //net_device        = "virtio-net"
   output_directory  = "output-ubuntu1804"
   qemuargs          = [["-m", "4096M"]]
-  shutdown_command  = "echo packer | sudo shutdown -P now"
-  ssh_password      = "password"
-  ssh_port          = 22
+  shutdown_command  = "echo 'packer' | sudo shutdown -P now"
   ssh_username      = "ubuntu"
+  ssh_password      = "ubuntu"
+  ssh_port          = 22
   ssh_wait_timeout  = "10000s"
   vm_name           = "ubuntu1804"
   use_default_display = true

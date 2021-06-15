@@ -83,7 +83,7 @@ variable "role" {
 
 variable "security_group_id" {
   type    = string
-  default = "sg-0cedabc8df636164f"
+  default = ""
 }
 
 variable "service" {
@@ -102,7 +102,7 @@ variable "source_ami" {
 
 variable "subnet_id" {
   type    = string
-  default = "subnet-0d969f189aad02f1a"
+  default = ""
 }
 
 variable "vagrant_ssh_private_key" {
@@ -112,7 +112,7 @@ variable "vagrant_ssh_private_key" {
 
 variable "vpc_id" {
   type    = string
-  default = "vpc-0943350383762ea0c"
+  default = ""
 }
 
 variable "skip_create_ami" {
