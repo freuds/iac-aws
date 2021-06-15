@@ -9,19 +9,17 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    # defaults:
-    #   run:
-    #     shell: bash
-    #     working-directory: _tools/ansible
+    defaults:
+      run:
+       shell: bash
+       working-directory: _tools/ansible
 
     steps:
     # Important: This sets up your GITHUB_WORKSPACE environment variable
     - uses: actions/checkout@v2
-      working-directory: _tools/ansible
 
     - name: Lint Ansible Playbook
       uses: ansible/ansible-lint-action@v4.1.0.post0
-  
       # env:
       #   ACTION_PLAYBOOK_NAME: bastion.yml
       with:
