@@ -1,16 +1,16 @@
 module "vpc" {
-  source                  = "git@github.com:xxxxxxxxxxxxxx/terraform-aws-vpc.git"
-  env                     = var.env
-  region                  = var.region
-  cidr_block              = var.cidr_block
-  subnet_priv_bits        = var.subnet_priv_bits
-  subnet_pub_bits         = var.subnet_pub_bits
-  subnet_pub_offset       = var.subnet_pub_offset
-  subnet_priv_tags        = var.subnet_priv_tags
-  subnet_pub_tags         = var.subnet_pub_tags
-  internal_domain_name    = var.internal_domain_name
-  external_domain_name    = var.external_domain_name
-  one_nat_gateway_per_az  = var.one_nat_gateway_per_az
+  source                 = "git@github.com:xxxxxxxxxxxxxx/terraform-aws-vpc.git"
+  env                    = var.env
+  region                 = var.region
+  cidr_block             = var.cidr_block
+  subnet_priv_bits       = var.subnet_priv_bits
+  subnet_pub_bits        = var.subnet_pub_bits
+  subnet_pub_offset      = var.subnet_pub_offset
+  subnet_priv_tags       = var.subnet_priv_tags
+  subnet_pub_tags        = var.subnet_pub_tags
+  internal_domain_name   = var.internal_domain_name
+  external_domain_name   = var.external_domain_name
+  one_nat_gateway_per_az = var.one_nat_gateway_per_az
 }
 
 module "bastion" {
@@ -27,7 +27,7 @@ module "bastion" {
   subnet_ids                 = module.vpc.public_subnets
   # s3_vault_bucket            = data.terraform_remote_state.baseline.outputs.s3-vault-bucket
   # root_keypair               = data.terraform_remote_state.baseline.outputs.root_keypair
-  extra_userdata             = data.template_file.extra-userdata.rendered
+  extra_userdata = data.template_file.extra-userdata.rendered
 }
 
 data "template_file" "extra-userdata" {
