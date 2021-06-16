@@ -1,6 +1,9 @@
 # source. Read the documentation for source blocks here:
 # https://www.packer.io/docs/templates/hcl_templates/blocks/source
 
+//####################################################
+// AMAZON-EBS
+//####################################################
 source "amazon-ebs" "debian" {
   ami_description = "debian-${var.service}-${var.role}"
   ami_name        = "${var.service}-${var.role}-${legacy_isotime("2006-01-02T15-04-05")}"
@@ -41,69 +44,78 @@ source "amazon-ebs" "debian" {
   }
 }
 
-    // "<enter><wait><f6><wait><esc><wait>",
-    // "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
-    // "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
-    // "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
-    // "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
-    // "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
-    // "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
-    // "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
-    // "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
-    // "<bs><bs><bs>",
-    // "/install/vmlinuz noapic ",
-    // "file=/floppy/preseed.cfg ",
-    // "debian-installer=en_US auto locale=en_US kbd-chooser/method=us ",
-    // "hostname=vagrant ",
-    // "fb=false debconf/frontend=noninteractive ",
-    // "keyboard-configuration/modelcode=SKIP ",
-    // "keyboard-configuration/layout=USA ",
-    // "keyboard-configuration/variant=USA console-setup/ask_detect=false ",
-    // "passwd/user-fullname=vagrant ",
-    // "passwd/user-password=vagrant ",
-    // "passwd/user-password-again=vagrant ",
-    // "passwd/username=vagrant ",
-    // "initrd=/install/initrd.gz -- <enter>"
+//####################################################
+// QEMU
+//####################################################
+source "qemu" "debian" {
+  boot_command      = [
+      "<wait><wait><wait>c<wait><wait><wait>",
+      "linux /install.amd/vmlinuz ",
+      "auto=true ",
+      "url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/${var.preseed_file} ",
+      "hostname=${var.vm_name} ",
+      "domain=${var.domain} ",
+      "interface=auto ",
+      "vga=788 noprompt quiet --<enter>",
+      "initrd=/install/initrd.gz<enter>",
+      "boot=<enter>"
+  ]
+  boot_wait         = var.boot_wait
+  communicator      = var.communicator
+  cpus              = var.cpus
+  disk_size         = var.disk_size
+  headless          = var.headless
 
-source "qemu" "ubuntu" {
-    boot_command      = [
-      "<esc><esc><enter><wait>",
-      "/install/vmlinuz noapic ",
-      "preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg ",
-      "debian-installer=en_US auto locale=en_US kbd-chooser/method=us ",
-      "hostname={{ .Name }} ",
-      "fb=false debconf/frontend=noninteractive ",
-      "keyboard-configuration/modelcode=SKIP keyboard-configuration/layout=USA ",
-      "keyboard-configuration/variant=USA console-setup/ask_detect=false ",
-      "initrd=/install/initrd.gz -- <enter>"
-  ]
-  // floppy_files      = ["../../_tools/packer/templates/debian-buster/http/preseed.cfg"]
-  boot_wait         = "1800s"
-  disk_interface    = "virtio"
-  disk_size         = 6000
-  format            = "qcow2"
-  headless          = true
-  http_directory    = "../../_tools/packer/templates/debian-buster/http"
-  // http_port_max     = 10089
-  // http_port_min     = 10082
+  disk_interface    = var.disk_interface
+  format            = var.qemu_format
+  host_port_max     = var.http_port_max
+  host_port_min     = var.http_port_min
+  http_directory    = var.http_directory
+  http_port_max     = var.http_port_max
+  http_port_min     = var.http_port_min
+  iso_checksum = var.iso_checksum
+  iso_target_path      = "${var.packer_cache_dir}/${var.iso_file}"
   iso_urls           = [
-    "http://cdimage.ubuntu.com/releases/bionic/release/ubuntu-18.04.5-server-arm64.iso"
+    "${var.iso_path_internal}/${var.iso_file}",
+    "${var.iso_path_external}/${var.iso_file}"
   ]
-  iso_checksum = "2cd7742c91bbb325622e8314500106cfa1074fcf5a6a380e8878bbbb9974e9f3"
-  //net_device        = "virtio-net"
-  output_directory  = "output-ubuntu1804"
-  qemuargs          = [["-m", "4096M"]]
-  shutdown_command  = "echo 'packer' | sudo shutdown -P now"
-  ssh_username      = "ubuntu"
-  ssh_password      = "ubuntu"
-  ssh_port          = 22
-  ssh_wait_timeout  = "10000s"
-  vm_name           = "ubuntu1804"
-  use_default_display = true
+  memory = var.memory
+  output_directory  = var.output_directory
+  shutdown_command  = var.shutdown_command
+  shutdown_timeout  = var.shutdown_timeout
+  vm_name           = var.vm_name
+
+  ssh_agent_auth    = var.ssh_agent_auth
+  ssh_clear_authorized_keys = var.ssh_clear_authorized_keys
+  ssh_disable_agent_forwarding = var.ssh_disable_agent_forwarding
+  ssh_file_transfer_method = var.ssh_file_transfer_method
+  ssh_keep_alive_interval = var.ssh_keep_alive_interval
+  ssh_password = var.ssh_password
+  ssh_port = var.ssh_port
+  ssh_pty = var.ssh_pty
+  ssh_timeout = var.ssh_timeout
+  ssh_username = var.ssh_username
+  ssh_wait_timeout  = var.ssh_wait_timeout
+
+  accelerator = var.accelerator
+  disk_cache = "writeback"
+  disk_compression = false
+  disk_discard = "ignore"
+  disk_image = false
+  iso_skip_cache = false
+  machine_type = "pc"
+  net_device = "virtio-net"
+  qemu_binary = var.qemu_binary
+  skip_compaction = true
+  use_default_display = false
+  vnc_bind_address = var.vnc_vrdp_bind_address
+  vnc_port_max = var.vnc_vrdp_port_max
+  vnc_port_min = var.vnc_vrdp_port_min
+  qemuargs          = [["-global", "virtio-pci.disable-modern=on", "-m", "4096M"]]
 }
 
 // source "virtualbox-ovf" "autogenerated_3" {
-//   checksum             = "${var.box_checksum}"
+//   checksum             = var.box_checksum
 //   communicator         = "ssh"
 //   guest_additions_mode = "disable"
 //   headless             = true
