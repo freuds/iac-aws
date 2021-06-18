@@ -81,7 +81,7 @@ fi
 # Build local part
 if [ "$1" = "-local" ]; then
 
-  if [ -z "$2" ]; then
+  if [ -z "$2" ] || [ "$2" != "qemu" ]; then
 
     info "==> starting build box"
 
@@ -90,9 +90,9 @@ if [ "$1" = "-local" ]; then
     BOX_DISTRIB="${BOX_NAME##*/}"
     PACKER_ONLY="virtualbox-ovf"
 
-    info "==> packer: BOX_OS=${BOX_OS}"
-    info "==> packer: BOX_NAME=${BOX_NAME}"
-    info "==> packer: BOX_DISTRIB=${BOX_DISTRIB}"
+    # info "==> packer: BOX_OS=${BOX_OS}"
+    # info "==> packer: BOX_NAME=${BOX_NAME}"
+    # info "==> packer: BOX_DISTRIB=${BOX_DISTRIB}"
 
     # Get some metadata box from cloud repositories
     # To find/fix somes URL boxes : try https://app.vagrantup.com/boxes/search
@@ -161,28 +161,27 @@ if [ "$1" = "-local" ]; then
     PACKER_ONLY="virtualbox-ovf"
     PACKER_EXTRA_ARGS="${*:2}"
 
-    echo "==> packer: SSH command: ssh -i ~/.vagrant.d/insecure_private_key -p 62222 vagrant@localhost"
-    echo "==> packer: BOX_VERSION=${BOX_VERSION}"
-    echo "==> packer: BOX_OS=${BOX_OS}"
-    echo "==> packer: BOX_NAME=${BOX_NAME}"
-    echo "==> packer: BOX_FILENAME=${BOX_FILENAME}"
-    echo "==> packer: BOX_DISTRIB=${BOX_DISTRIB}"
-    echo "==> packer: VAGRANT_BOX_FOLDER=${VAGRANT_BOX_FOLDER}"
-    echo "==> packer: BOX_BASE_MAC=${BOX_BASE_MAC}"
-    echo "==> packer: BOX_CHECKSUM=${BOX_CHECKSUM}"
-    echo "==> packer: OVF_CHECKSUM=${OVF_CHECKSUM}"
+    info "==> packer: SSH command: ssh -i ~/.vagrant.d/insecure_private_key -p 62222 vagrant@localhost"
+    info "==> packer: BOX_VERSION=${BOX_VERSION}"
+    info "==> packer: BOX_OS=${BOX_OS}"
+    info "==> packer: BOX_NAME=${BOX_NAME}"
+    info "==> packer: BOX_FILENAME=${BOX_FILENAME}"
+    info "==> packer: BOX_DISTRIB=${BOX_DISTRIB}"
+    info "==> packer: VAGRANT_BOX_FOLDER=${VAGRANT_BOX_FOLDER}"
+    info "==> packer: BOX_BASE_MAC=${BOX_BASE_MAC}"
+    info "==> packer: BOX_CHECKSUM=${BOX_CHECKSUM}"
+    info "==> packer: OVF_CHECKSUM=${OVF_CHECKSUM}"
 
   else
-    
     PACKER_EXTRA_ARGS="${*:3}"
     PACKER_ONLY="qemu.debian"
   fi
 fi
 
 # build image with packer
-echo "==> packer: PACKER_ONLY=${PACKER_ONLY}"
-echo "==> packer: PACKER_OUTPUT_FILE=${PACKER_OUTPUT_FILE}"
-echo "==> packer: PACKER_EXTRA_ARGS=${PACKER_EXTRA_ARGS}"
+info "==> packer: PACKER_ONLY=${PACKER_ONLY}"
+info "==> packer: PACKER_OUTPUT_FILE=${PACKER_OUTPUT_FILE}"
+info "==> packer: PACKER_EXTRA_ARGS=${PACKER_EXTRA_ARGS}"
 
 if [ -z "${PACKER_EXTRA_ARGS}" ]; then
   PACKER_EXTRA_ARGS="--"

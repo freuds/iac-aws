@@ -61,7 +61,7 @@ variable "box_version" {
 
 variable "instance_type" {
   type    = string
-  default = "t3.micro"
+  default = "t2.micro"
 }
 
 variable "inventory_groups" {
@@ -78,6 +78,26 @@ variable "region" {
 }
 
 variable "role" {
+  type = string
+}
+
+variable "country" {
+  default = "FR"
+  type = string
+}
+
+variable "locale" {
+  default = "en_US.UTF-8"
+  type = string
+}
+
+variable "language" {
+  default = "en"
+  type = string
+}
+
+variable "keyboard" {
+  default = "us"
   type = string
 }
 
@@ -121,8 +141,12 @@ variable "skip_create_ami" {
 }
 
 variable "accelerator" {
-  default = "hvf"
+  default = "kvm"
   description = "Use KVM for linux host or HVF for MacOS"
+}
+
+variable "apt_cache_url" {
+  default = "http://myserver:3142"
 }
 
 variable "boot_wait" {
@@ -131,7 +155,7 @@ variable "boot_wait" {
 
 variable "disk_interface" {
   type = string
-  default = "virtio-scsi"
+  default = "virtio"
 }
 
 variable "disk_size" {
@@ -145,8 +169,7 @@ variable "domain" {
 
 variable "qemu_format" {
   type = string
-  // default = "qcow2"
-  default = "raw"
+  default = "qcow2"
   description = "Virtualization format for QEMU"
 }
 
@@ -164,8 +187,12 @@ variable "cpus" {
   type = number
 }
 
+variable "cpu_type" {
+  default = ""
+}
+
 variable "preseed_file" {
-  default = "template/debian-buster/http/base-uefi.preseed"
+  default = "base-uefi.preseed"
 }
 
 variable "host_port_max" {
@@ -192,6 +219,10 @@ variable "http_directory" {
   default = "../../_tools/packer/templates/debian-buster/http"
 }
 
+variable "machine_type" {
+  default = "pc"
+}
+
 variable "packer_cache_dir" {
   default = "packer_cache"
 }
@@ -208,6 +239,7 @@ variable "iso_checksum" {
 variable "iso_path_external" {
   default = "http://cdimage.debian.org/cdimage/release/current/amd64/iso-cd"
 }
+
 variable "iso_path_internal" {
   default = "http://myserver:8080/debian"
 }
@@ -218,7 +250,7 @@ variable "memory" {
 }
 
 variable "output_directory" {
-  default = "packer_cache/build-debian10"
+  default = "packer_cache/build"
 }
 
 variable "shutdown_command" {
