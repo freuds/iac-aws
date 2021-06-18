@@ -26,6 +26,6 @@ variable "trusted_networks" {
 }
 
 variable "s3_endpoint_enabled" {
-  type = bool
+  type    = bool
   default = false
 }

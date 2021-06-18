@@ -31,13 +31,13 @@ resource "aws_cloudfront_distribution" "assets_distribution" {
   }
 
   default_cache_behavior {
-    allowed_methods  = [
+    allowed_methods = [
       "GET",
       "HEAD",
-      "OPTIONS"]
-    cached_methods   = [
+    "OPTIONS"]
+    cached_methods = [
       "GET",
-      "HEAD"]
+    "HEAD"]
     target_origin_id = keys(var.s3_origins).0
 
     forwarded_values {
@@ -65,8 +65,8 @@ resource "aws_cloudfront_distribution" "assets_distribution" {
 
       forwarded_values {
         query_string = false
-        headers      = [
-          "Origin"]
+        headers = [
+        "Origin"]
 
         cookies {
           forward = "none"

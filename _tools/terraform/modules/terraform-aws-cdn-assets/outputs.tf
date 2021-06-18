@@ -10,5 +10,5 @@ output "cloudfront_distribution_arn" {
 
 output "origin_access_identity_arn" {
   description = "ARN from the origin access identity"
-  value = aws_cloudfront_origin_access_identity.origin_access_identity.iam_arn
+  value       = aws_cloudfront_origin_access_identity.origin_access_identity.iam_arn
 }

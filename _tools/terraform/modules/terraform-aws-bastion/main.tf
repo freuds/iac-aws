@@ -2,7 +2,7 @@
 # SG bastion ssh ingress
 ########################################
 resource "aws_security_group" "bastion" {
-  name        = "sgp-bastion"
+  name        = "sgp-${var.env}-${var.service}"
   vpc_id      = var.vpc_id
   description = "Bastion security group (only SSH inbound access is allowed)"
   ingress {
@@ -11,9 +11,9 @@ resource "aws_security_group" "bastion" {
     protocol    = "tcp"
     cidr_blocks = var.cidr_blocks
   }
-  tags        = {
-    Name    = "sg-${var.env}-${var.service}",
-    Service = var.service
+  tags = {
+    Name        = "sgp-${var.env}-${var.service}",
+    Service     = var.service
     Environment = var.env
   }
   lifecycle {
@@ -34,9 +34,9 @@ resource "aws_security_group" "allow-all-egress" {
     protocol    = "-1"
     cidr_blocks = var.outbound_cidr_blocks
   }
-  tags        = {
-    Name    = "sg-allow-all-egress",
-    Service = var.service
+  tags = {
+    Name        = "sgp-allow-all-egress",
+    Service     = var.service
     Environment = var.env
   }
   lifecycle {
@@ -52,15 +52,15 @@ resource "aws_security_group" "ssh-from-bastion" {
   description = "Allow all ssh from remote bastion servers"
   vpc_id      = var.vpc_id
   ingress {
-    from_port       = var.ssh_port
-    to_port         = var.ssh_port
-    protocol        = "tcp"
+    from_port = var.ssh_port
+    to_port   = var.ssh_port
+    protocol  = "tcp"
     security_groups = [
-      aws_security_group.bastion.id]
+    aws_security_group.bastion.id]
   }
-  tags        = {
-    Name    = "sg-ssh-from-bastion",
-    Service = var.service
+  tags = {
+    Name        = "sgp-ssh-from-bastion",
+    Service     = var.service
     Environment = var.env
   }
   lifecycle {
@@ -106,11 +106,11 @@ resource "aws_launch_configuration" "bastion" {
   image_id             = var.ami
   instance_type        = var.instance_type
   user_data            = data.template_cloudinit_config.config.rendered
-  # key_name             = var.root_keypair
+  key_name             = var.root_keypair
   iam_instance_profile = aws_iam_instance_profile.bastion-instance-profile.name
-  security_groups      = [
+  security_groups = [
     aws_security_group.bastion.id,
-    aws_security_group.allow-all-egress.id]
+  aws_security_group.allow-all-egress.id]
   lifecycle {
     create_before_destroy = true
   }
@@ -120,7 +120,7 @@ resource "aws_launch_configuration" "bastion" {
 # ASG bastion
 ########################################
 resource "aws_autoscaling_group" "bastion" {
-  name                      = replace(aws_launch_configuration.bastion.name, "lc-", "asg-")
+  name = replace(aws_launch_configuration.bastion.name, "lc-", "asg-")
   # availability_zones        = var.azs
   desired_capacity          = var.asg_desired_capacity
   min_size                  = var.asg_min_size
@@ -144,7 +144,7 @@ resource "aws_autoscaling_group" "bastion" {
 
   tags = [
     {
-      Name                 = format("%s-%s", var.env, var.service)
+      Name                = format("%s-%s", var.env, var.service)
       propagate_at_launch = true
       Service             = var.service
     }
@@ -182,7 +182,7 @@ data "aws_iam_policy_document" "attach-eip" {
     ]
 
     resources = [
-      "*"]
+    "*"]
   }
 }
 
@@ -195,7 +195,7 @@ resource "aws_route53_record" "public_dns_bastion" {
   type    = "A"
   ttl     = var.r53_pub_ttl
   records = [
-    aws_eip.eip_bastion.public_ip]
+  aws_eip.eip_bastion.public_ip]
 }
 
 
@@ -211,7 +211,7 @@ resource "aws_iam_instance_profile" "bastion-instance-profile" {
 # IAM role for bastion
 ########################################
 resource "aws_iam_role" "bastion-role" {
-  name               = "bastion-role"
+  name = "bastion-role"
   # assume_role_policy = aws_iam_policy_document.bastion-role.json
 
   assume_role_policy = <<EOF

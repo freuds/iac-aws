@@ -1,7 +1,7 @@
 variable "s3_origins" {
   description = "Map of s3 origins and bucket names"
   type        = map(string)
-  default     = {
+  default = {
     statics = "bucket_name_statics",
     media   = "bucket_name_media"
   }
@@ -10,7 +10,7 @@ variable "s3_origins" {
 variable "s3_origins_paths" {
   description = "Map of s3 origins and bucket paths"
   type        = map(string)
-  default     = {
+  default = {
     statics = "static_path",
     media   = "media_path"
   }
@@ -49,7 +49,7 @@ variable "price_class" {
 variable "allowed_methods" {
   description = "allowed method for ordered cache behavior"
   type        = list(string)
-  default     = [
+  default = [
     "GET",
     "HEAD",
     "OPTIONS"
@@ -59,7 +59,7 @@ variable "allowed_methods" {
 variable "cached_methods" {
   description = "cached method for ordered cache behavior"
   type        = list(string)
-  default     = [
+  default = [
     "GET",
     "HEAD",
     "OPTIONS"
@@ -81,7 +81,7 @@ variable "comment_OAI" {
 variable "aliases_cloudfront" {
   description = "Alias list for cloudfront distribution"
   type        = list(string)
-  default     = [
+  default = [
     "test.com"
   ]
 }

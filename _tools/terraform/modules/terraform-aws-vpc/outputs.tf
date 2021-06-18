@@ -27,7 +27,7 @@ output "public_subnets_cidr" {
 }
 
 output "private_subnets" {
-  value = [for s in aws_subnet.private: s.id]
+  value = [for s in aws_subnet.private : s.id]
 }
 
 output "private_subnets_cidr" {

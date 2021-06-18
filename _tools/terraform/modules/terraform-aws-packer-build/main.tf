@@ -2,7 +2,7 @@ resource "aws_vpc" "build" {
   cidr_block           = var.cidr_block
   enable_dns_support   = var.enable_dns_support
   enable_dns_hostnames = var.enable_dns_hostnames
-  tags                 = {
+  tags = {
     Name  = "build-vpc"
     Stack = "build"
   }
@@ -14,7 +14,7 @@ resource "aws_subnet" "public" {
   cidr_block              = cidrsubnet(var.cidr_block, var.subnet_bits, index(lookup(var.azs, var.region), each.key))
   availability_zone       = each.key
   map_public_ip_on_launch = "true"
-  tags                    = {
+  tags = {
     Name  = "build-pub-subnet-${index(lookup(var.azs, var.region), each.key)}"
     Stack = "build"
   }
@@ -22,7 +22,7 @@ resource "aws_subnet" "public" {
 
 resource "aws_internet_gateway" "gw" {
   vpc_id = aws_vpc.build.id
-  tags   = {
+  tags = {
     Name  = "build-igw"
     Stack = "build"
   }
@@ -34,7 +34,7 @@ resource "aws_route_table" "public" {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.gw.id
   }
-  tags   = {
+  tags = {
     Name  = "build-pub-rt"
     Stack = "build"
   }
@@ -58,7 +58,7 @@ resource "aws_vpc_endpoint" "s3" {
   count        = var.s3_endpoint_enabled ? 1 : 0
   vpc_id       = aws_vpc.build.id
   service_name = data.aws_vpc_endpoint_service.s3[count.index].service_name
-  tags   = {
+  tags = {
     Name  = "build-s3-endpoint"
     Stack = "build"
   }
@@ -82,13 +82,13 @@ resource "aws_security_group" "packer" {
     cidr_blocks = var.trusted_networks
   }
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    from_port = 0
+    to_port   = 0
+    protocol  = "-1"
     cidr_blocks = [
-      "0.0.0.0/0"]
+    "0.0.0.0/0"]
   }
-  tags        = {
+  tags = {
     Name  = "sgp-packer"
     Stack = "build"
   }

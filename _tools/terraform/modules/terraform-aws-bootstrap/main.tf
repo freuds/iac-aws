@@ -4,7 +4,7 @@ resource "aws_organizations_organization" "org" {
 }
 
 resource "aws_organizations_account" "account" {
-  depends_on = [aws_organizations_organization.org]
+  depends_on                 = [aws_organizations_organization.org]
   count                      = length(keys(var.accounts))
   name                       = "${var.org_prefix}-${element(keys(var.accounts), count.index)}"
   email                      = element(values(var.accounts), count.index)

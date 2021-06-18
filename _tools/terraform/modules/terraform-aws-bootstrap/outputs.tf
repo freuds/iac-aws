@@ -1,9 +1,9 @@
 output "account_arns" {
-  value = zipmap(keys(var.accounts),aws_organizations_account.account.*.arn)
+  value = zipmap(keys(var.accounts), aws_organizations_account.account.*.arn)
 }
 
 output "account_ids" {
-  value = zipmap(keys(var.accounts),aws_organizations_account.account.*.id)
+  value = zipmap(keys(var.accounts), aws_organizations_account.account.*.id)
 }
 
 output "account_emails" {
@@ -43,6 +43,6 @@ output "iam_user_tf_cloud_access_key" {
 }
 
 output "iam_user_tf_cloud_secret" {
-  value = aws_iam_access_key.tf-cloud.secret
+  value     = aws_iam_access_key.tf-cloud.secret
   sensitive = true
 }

@@ -1,12 +1,12 @@
 variable "env" {
-  type = string
-  default = ""
+  type        = string
+  default     = ""
   description = "Environment"
 }
 
 variable "region" {
-  type = string
-  default = "eu-west-1"
+  type        = string
+  default     = "eu-west-1"
   description = "Region selected"
 }
 
@@ -15,32 +15,32 @@ variable "cidr_block" {
 }
 
 variable "subnet_priv_bits" {
-  default = 4
+  default     = 4
   description = "Tell how bits are added from CIDR for private subnet"
 }
 
 variable "subnet_pub_bits" {
-  default = 6
+  default     = 6
   description = "Tell how bits are added from CIDR for public subnet"
 }
 
 variable "subnet_pub_offset" {}
 
 variable "internal_domain_name" {
-  type = string
-  default = ""
+  type        = string
+  default     = ""
   description = "DNS domain name for zone private"
 }
 
 variable "external_domain_name" {
-  type = string
-  default = ""
+  type        = string
+  default     = ""
   description = "DNS domain name for zone public"
 }
 
 variable "azs" {
   description = "List of all AZs per region available"
-  type = map(list(string))
+  type        = map(list(string))
   default = {
     eu-west-1 = [
       "eu-west-1a",
@@ -57,7 +57,7 @@ variable "azs" {
 }
 
 variable "r53_ttl" {
-  default = 300
+  default     = 300
   description = "Time To Live : DNS timeout"
 }
 
@@ -67,12 +67,12 @@ variable "one_nat_gateway_per_az" {
 }
 
 variable "subnet_pub_tags" {
-  default = {}
+  default     = {}
   description = "Tags for public subnet"
 }
 
 variable "subnet_priv_tags" {
-  default = {}
+  default     = {}
   description = "Tags for private subnet"
 }
 
@@ -81,5 +81,5 @@ variable "s3_endpoint_enabled" {
 }
 
 variable "dynamodb_endpoint_enabled" {
-  default = true
+  default = false
 }

@@ -25,9 +25,9 @@ module "bastion" {
   asg_max_size               = var.bastion_asg_max_size
   aws_route53_zone_public_id = module.vpc.public_host_zone
   subnet_ids                 = module.vpc.public_subnets
+  extra_userdata             = data.template_file.extra-userdata.rendered
   # s3_vault_bucket            = data.terraform_remote_state.baseline.outputs.s3-vault-bucket
   # root_keypair               = data.terraform_remote_state.baseline.outputs.root_keypair
-  extra_userdata = data.template_file.extra-userdata.rendered
 }
 
 data "template_file" "extra-userdata" {

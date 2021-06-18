@@ -21,6 +21,10 @@ Inside file __vpc/_terraform/variables.tf__ , the variable __one_nat_gateway_per
 
 ## Terraform Cloud usage
 
+## SSH to bastion
+
+Host : bastion.qa.<project_name>.domain.com
+
 
 ## Tree Structure for tools/libraries
 

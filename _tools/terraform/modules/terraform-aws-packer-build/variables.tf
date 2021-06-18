@@ -3,7 +3,7 @@ variable "region" {
 }
 
 variable "azs" {
-  type    = map(list(string))
+  type = map(list(string))
   default = {
     "eu-west-1" = [
       "eu-west-1a"
@@ -31,11 +31,11 @@ variable "enable_dns_hostnames" {
 }
 
 variable "trusted_networks" {
-  type = list(string)
+  type    = list(string)
   default = ["0.0.0.0/0"]
 }
 
 variable "s3_endpoint_enabled" {
-  type = bool
+  type    = bool
   default = false
 }

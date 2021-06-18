@@ -29,7 +29,7 @@ variable "vpc_id" {
 }
 
 variable "cidr_blocks" {
-  type    = list(string)
+  type = list(string)
   default = [
     "0.0.0.0/0",
   ]
@@ -66,7 +66,7 @@ variable "outbound_port" {
 
 variable "outbound_cidr_blocks" {
   default = [
-    "0.0.0.0/0"]
+  "0.0.0.0/0"]
 }
 
 variable "r53_pub_ttl" {

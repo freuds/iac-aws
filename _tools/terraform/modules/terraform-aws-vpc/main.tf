@@ -17,12 +17,12 @@ resource "aws_vpc" "main" {
 resource "aws_subnet" "public" {
   for_each                = toset(lookup(var.azs, var.region))
   vpc_id                  = aws_vpc.main.id
-  cidr_block              = cidrsubnet(var.cidr_block, var.subnet_pub_bits, var.subnet_pub_offset +index(lookup(var.azs, var.region), each.key))
+  cidr_block              = cidrsubnet(var.cidr_block, var.subnet_pub_bits, var.subnet_pub_offset + index(lookup(var.azs, var.region), each.key))
   availability_zone       = each.key
   map_public_ip_on_launch = "true"
   tags = merge(
     {
-      Name = format("%s-pub-subnet-%s", var.env, trimprefix(each.key, var.region)),
+      Name        = format("%s-pub-subnet-%s", var.env, trimprefix(each.key, var.region)),
       Environment = var.env
     },
     var.subnet_pub_tags,
@@ -36,7 +36,7 @@ resource "aws_internet_gateway" "gw" {
   vpc_id = aws_vpc.main.id
 
   tags = {
-    Name = format("%s-igw", var.env),
+    Name        = format("%s-igw", var.env),
     Environment = var.env
   }
 }
@@ -45,7 +45,7 @@ resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
 
   tags = {
-    Name = format("%s-pub-rt", var.env),
+    Name        = format("%s-pub-rt", var.env),
     Environment = var.env
   }
 }
@@ -74,8 +74,8 @@ resource "aws_route53_zone" "public" {
 ####################################
 resource "aws_eip" "single-eip" {
   count = !var.one_nat_gateway_per_az ? 1 : 0
-  tags  = {
-    Name = format("%s-eip", var.env),
+  tags = {
+    Name        = format("%s-eip", var.env),
     Environment = var.env
   }
 }
@@ -87,8 +87,8 @@ resource "aws_nat_gateway" "single-natgw" {
   count         = !var.one_nat_gateway_per_az ? 1 : 0
   allocation_id = aws_eip.single-eip[count.index].id
   subnet_id     = aws_subnet.public[element(lookup(var.azs, var.region), 0)].id
-  tags  = {
-    Name = format("%s-natgw-%s", var.env, trimprefix(element(lookup(var.azs, var.region), 0), var.region)),
+  tags = {
+    Name        = format("%s-natgw-%s", var.env, trimprefix(element(lookup(var.azs, var.region), 0), var.region)),
     Environment = var.env
   }
 }
@@ -104,16 +104,16 @@ resource "aws_route53_record" "single-natgw-record" {
   ttl     = var.r53_ttl
   records = [
     aws_nat_gateway.single-natgw[count.index].public_ip
-    ]
+  ]
 }
 
 ####################################
 # Multi-NAT-GW : EIP
 ####################################
 resource "aws_eip" "multi-eip" {
-  for_each       = var.one_nat_gateway_per_az ? toset(lookup(var.azs, var.region)) : []
-  tags  = {
-    Name = format("%s-eip-%s", var.env, trimprefix(each.key, var.region)),
+  for_each = var.one_nat_gateway_per_az ? toset(lookup(var.azs, var.region)) : []
+  tags = {
+    Name        = format("%s-eip-%s", var.env, trimprefix(each.key, var.region)),
     Environment = var.env
   }
 }
@@ -123,12 +123,12 @@ resource "aws_eip" "multi-eip" {
 ####################################
 resource "aws_nat_gateway" "multi-natgw" {
 
-  for_each       = var.one_nat_gateway_per_az ? toset(lookup(var.azs, var.region)) : []
-  allocation_id  = aws_eip.multi-eip[each.key].id
-  subnet_id      = element([for o in aws_subnet.public : o.id], index(lookup(var.azs, var.region), each.key))
+  for_each      = var.one_nat_gateway_per_az ? toset(lookup(var.azs, var.region)) : []
+  allocation_id = aws_eip.multi-eip[each.key].id
+  subnet_id     = element([for o in aws_subnet.public : o.id], index(lookup(var.azs, var.region), each.key))
 
-  tags  = {
-    Name = format("%s-natgw-%s", var.env, trimprefix(each.key, var.region)),
+  tags = {
+    Name        = format("%s-natgw-%s", var.env, trimprefix(each.key, var.region)),
     Environment = var.env
   }
 
@@ -143,10 +143,10 @@ resource "aws_nat_gateway" "multi-natgw" {
 resource "aws_route53_record" "multi-natgw-record" {
 
   for_each = var.one_nat_gateway_per_az ? toset(lookup(var.azs, var.region)) : []
-  zone_id = aws_route53_zone.public.id
-  name    = format("natgw-%s", trimprefix(each.key, var.region))
-  type    = "A"
-  ttl     = var.r53_ttl
+  zone_id  = aws_route53_zone.public.id
+  name     = format("natgw-%s", trimprefix(each.key, var.region))
+  type     = "A"
+  ttl      = var.r53_ttl
   records = [
     aws_nat_gateway.multi-natgw[each.value].public_ip
   ]
@@ -163,7 +163,7 @@ resource "aws_subnet" "private" {
   map_public_ip_on_launch = "false"
   tags = merge(
     {
-      Name = format("%s-priv-subnet-%s", var.env, trimprefix(each.key, var.region)),
+      Name        = format("%s-priv-subnet-%s", var.env, trimprefix(each.key, var.region)),
       Environment = var.env
     },
     var.subnet_priv_tags,
@@ -198,13 +198,44 @@ resource "aws_route" "private-default" {
   for_each               = toset(lookup(var.azs, var.region))
   route_table_id         = aws_route_table.private[each.value].id
   destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = var.one_nat_gateway_per_az ? aws_nat_gateway.multi-natgw[each.value].id : aws_nat_gateway.single-natgw.0.id 
+  nat_gateway_id         = var.one_nat_gateway_per_az ? aws_nat_gateway.multi-natgw[each.value].id : aws_nat_gateway.single-natgw.0.id
 }
 
 resource "aws_route53_zone" "private" {
   name = var.internal_domain_name
   vpc {
     vpc_id = aws_vpc.main.id
+  }
+}
+
+####################################
+# VPC Endpoints
+####################################
+resource "aws_vpc_endpoint" "s3" {
+  count        = var.s3_endpoint_enabled ? 1 : 0
+  vpc_id       = aws_vpc.main.id
+  service_name = "com.amazonaws.${var.region}.s3"
+  route_table_ids = concat([
+  aws_route_table.public.id], [for o in aws_route_table.private : o.id])
+  tags = {
+    Environment = var.env,
+    Service     = "S3",
+    Stack       = "common",
+    Role        = "endpoint"
+  }
+}
+
+resource "aws_vpc_endpoint" "dynamodb" {
+  count        = var.dynamodb_endpoint_enabled ? 1 : 0
+  vpc_id       = aws_vpc.main.id
+  service_name = "com.amazonaws.${var.region}.dynamodb"
+  route_table_ids = concat([
+  aws_route_table.public.id], [for o in aws_route_table.private : o.id])
+  tags = {
+    Environment = var.env,
+    Service     = "DynamoDB",
+    Stack       = "common",
+    Role        = "endpoint"
   }
 }
 
@@ -230,30 +261,3 @@ resource "aws_route53_zone" "private" {
 #   }
 # }
 
-# resource "aws_vpc_endpoint" "s3" {
-#   count           = var.s3_endpoint_enabled ? 1 : 0
-#   vpc_id          = aws_vpc.main.id
-#   service_name    = "com.amazonaws.${var.region}.s3"
-#   route_table_ids = concat([
-#     aws_route_table.public.id], [for o in aws_route_table.private : o.id])
-#   tags            = {
-#     Environment = var.env,
-#     Service     = "S3",
-#     Stack       = "common",
-#     Role        = "endpoint"
-#   }
-# }
-
-# resource "aws_vpc_endpoint" "dynamodb" {
-#   count           = var.dynamodb_endpoint_enabled ? 1 : 0
-#   vpc_id          = aws_vpc.main.id
-#   service_name    = "com.amazonaws.${var.region}.dynamodb"
-#   route_table_ids = concat([
-#     aws_route_table.public.id], [for o in aws_route_table.private : o.id])
-#   tags            = {
-#     Environment = var.env,
-#     Service     = "DynamoDB",
-#     Stack       = "common",
-#     Role        = "endpoint"
-#   }
-# }
