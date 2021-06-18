@@ -69,10 +69,29 @@ variable "bastion_asg_max_size" {
   type        = number
   default     = 1
   description = "Define the maximum size for the AutoScalingGroup"
-
 }
 
 variable "root_keypair" {
   type    = string
   default = "aws-key"
 }
+
+variable "GANDI_API_KEY" {}
+
+variable "gandi_domain_name" {
+  default     = "domain.com"
+  type        = string
+  description = "Domain Name"
+}
+
+variable "gandi_alias_ns" {
+  default     = "domain.com"
+  type        = string
+  description = "Domain Name"
+}
+
+variable "gandi_aws_ns" {
+  default     = []
+  type        = list(string)
+  description = "AWS API Route53 for delegation domain"
+} 

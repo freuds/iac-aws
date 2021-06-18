@@ -13,6 +13,14 @@ module "vpc" {
   one_nat_gateway_per_az = var.one_nat_gateway_per_az
 }
 
+module "gandi-dns" {
+  source            = "git@github.com:xxxxxxxxxxxxxx/terraform-gandi-dns.git"
+  gandi_api_key     = var.GANDI_API_KEY
+  gandi_domain_name = var.gandi_domain_name
+  gandi_alias_ns    = var.gandi_alias_ns
+  gandi_aws_ns      = var.gandi_aws_ns
+}
+
 module "bastion" {
   source                     = "git@github.com:xxxxxxxxxxxxxx/terraform-aws-bastion.git"
   region                     = var.region
@@ -27,7 +35,7 @@ module "bastion" {
   subnet_ids                 = module.vpc.public_subnets
   extra_userdata             = data.template_file.extra-userdata.rendered
   # s3_vault_bucket            = data.terraform_remote_state.baseline.outputs.s3-vault-bucket
-  root_keypair               = var.root_keypair
+  root_keypair = var.root_keypair
 }
 
 data "template_file" "extra-userdata" {

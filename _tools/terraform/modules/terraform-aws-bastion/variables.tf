@@ -86,6 +86,6 @@ variable "subnet_ids" {
 # }
 
 variable "root_keypair" {
-  type = string
+  type    = string
   default = ""
 }
