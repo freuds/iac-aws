@@ -6,7 +6,7 @@ variable "template" {
 
 variable "PROJECT_CI" {
   type    = string
-  default = "https://github.com/freuds/iac-aws.git"
+  default = ""
 }
 
 variable "PROJECT_ENV" {
@@ -16,17 +16,17 @@ variable "PROJECT_ENV" {
 
 variable "PROJECT_GIT" {
   type    = string
-  default = "https://github.com/freuds/iac-aws.git"
+  default = ""
 }
 
 variable "PROJECT_NAME" {
   type    = string
-  default = "IAC-AWS"
+  default = ""
 }
 
 variable "PROJECT_OWNER" {
   type    = string
-  default = "frederic.willien@revolve.team"
+  default = ""
 }
 
 variable "profile" {
