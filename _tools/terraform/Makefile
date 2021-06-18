@@ -72,6 +72,10 @@ list:	## Make terraform state list
 	@make symlinks
 	@terraform state list
 
+providers:	## Make terraform state list
+	@$(call cyan, "List Providers configuration")
+	@terraform providers
+
 install:  ## Make tfenv install
 	@$(call cyan, "Terraform Install")
 	@tfenv install $(shell cat .terraform-version)
