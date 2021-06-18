@@ -11,6 +11,8 @@ one_nat_gateway_per_az = false
 
 bastion_ami = "ami-008a529621da89825"
 
+root_keypair = "iac-aws-key"
+
 # subnet_priv_tags = {
 #   "kubernetes.io/cluster/qa-eks-cluster" = "shared"
 #   "kubernetes.io/role/internal-elb"      = "1"

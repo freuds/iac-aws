@@ -23,7 +23,12 @@ Inside file __vpc/_terraform/variables.tf__ , the variable __one_nat_gateway_per
 
 ## SSH to bastion
 
+1. create a new key pair on [AWS Console](https://eu-west-1.console.aws.amazon.com/ec2/v2/home?region=eu-west-1#KeyPairs:) and use 'iac-aws-key' like key name
+
+2. 
+
 Host : bastion.qa.<project_name>.domain.com
+Username : 
 
 
 ## Tree Structure for tools/libraries
@@ -44,8 +49,9 @@ _tools
         └── terraform-aws-vpc
 ```
 
-## Tree structure for services
+## Minimum structure for one service
 
+```
 vpc
 ├── qa
 │   ├── eu-west-1
@@ -63,3 +69,4 @@ vpc
     ├── backend.tf
     ├── remote-states.tf
     └── provider.tf
+```

@@ -72,7 +72,7 @@ variable "bastion_asg_max_size" {
 
 }
 
-# variable "db_name" {
-#   type    = string
-#   default = "database"
-# }
+variable "root_keypair" {
+  type    = string
+  default = "aws-key"
+}

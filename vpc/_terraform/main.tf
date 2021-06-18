@@ -27,7 +27,7 @@ module "bastion" {
   subnet_ids                 = module.vpc.public_subnets
   extra_userdata             = data.template_file.extra-userdata.rendered
   # s3_vault_bucket            = data.terraform_remote_state.baseline.outputs.s3-vault-bucket
-  # root_keypair               = data.terraform_remote_state.baseline.outputs.root_keypair
+  root_keypair               = var.root_keypair
 }
 
 data "template_file" "extra-userdata" {
