@@ -32,7 +32,7 @@ warm() {
 # Variables
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
-PACKER_ONLY="amazon-ebs"
+PACKER_ONLY="amazon-ebs.source"
 PACKER_EXTRA_ARGS="${*}"
 PACKER_TEMPLATE_DIR="$SCRIPT_DIR/templates"
 PACKER_OUTPUT_FILE="$(pwd)/packer.out"
