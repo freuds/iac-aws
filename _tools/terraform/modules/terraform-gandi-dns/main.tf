@@ -22,4 +22,8 @@ resource "gandi_livedns_record" "aws-ns" {
   type     = "NS"
   ttl      = var.ns_ttl
   values   = var.gandi_aws_ns
+
+  lifecycle {
+    create_before_destroy = true
   }
+}
