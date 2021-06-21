@@ -21,6 +21,8 @@ module "gandi-dns" {
   gandi_aws_ns      = var.gandi_aws_ns
 }
 
+// data .terraform_remote_state
+
 module "bastion" {
   source                     = "git@github.com:xxxxxxxxxxxxxx/terraform-aws-bastion.git"
   region                     = var.region
