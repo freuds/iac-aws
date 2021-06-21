@@ -18,8 +18,11 @@ module "gandi-dns" {
   gandi_api_key     = var.GANDI_API_KEY
   gandi_domain_name = var.gandi_domain_name
   gandi_alias_ns    = var.gandi_alias_ns
-  gandi_aws_ns      = var.gandi_aws_ns
+  gandi_aws_ns      = module.vpc.public_name_servers
 }
+
+
+// data .terraform_remote_state
 
 module "bastion" {
   source                     = "git@github.com:xxxxxxxxxxxxxx/terraform-aws-bastion.git"
