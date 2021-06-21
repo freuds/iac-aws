@@ -16,7 +16,6 @@ data "gandi_domain" "origin" {
 }
 
 resource "gandi_livedns_record" "aws-ns" {
-  //for_each = toset(var.gandi_aws_ns)
   zone     = data.gandi_domain.origin.id
   name     = var.gandi_alias_ns
   type     = "NS"
