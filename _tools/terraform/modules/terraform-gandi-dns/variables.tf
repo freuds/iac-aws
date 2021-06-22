@@ -22,7 +22,7 @@ variable "gandi_aws_ns" {
 }
 
 variable "gandi_alias_ns" {
-  default = ""
-  type = string
+  default     = ""
+  type        = string
   description = "Alias Name for NS records"
 }

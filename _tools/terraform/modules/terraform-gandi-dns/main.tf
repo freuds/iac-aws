@@ -16,11 +16,11 @@ data "gandi_domain" "origin" {
 }
 
 resource "gandi_livedns_record" "aws-ns" {
-  zone     = data.gandi_domain.origin.id
-  name     = var.gandi_alias_ns
-  type     = "NS"
-  ttl      = var.ns_ttl
-  values   = var.gandi_aws_ns
+  zone   = data.gandi_domain.origin.id
+  name   = var.gandi_alias_ns
+  type   = "NS"
+  ttl    = var.ns_ttl
+  values = var.gandi_aws_ns
 
   lifecycle {
     create_before_destroy = true
