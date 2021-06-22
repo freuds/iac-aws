@@ -3,15 +3,6 @@
 set -e -o pipefail
 set +x
 
-# Check for required tools
-declare -a req_tools=("packer" "hcl2json" "sed" "curl" "jq")
-for tool in "${req_tools[@]}"; do
-  if ! command -v "$tool" > /dev/null; then
-    fail "It looks like '${tool}' is not installed; please install it and run this setup script again."
-    exit 1
-  fi
-done
-
 # functions
 info() {
   printf "\r\033[00;35m$1\033[0m\n"
@@ -28,6 +19,15 @@ fail() {
 warm() {
   printf "\r\033[0;33m$1\033[0m\n"
 }
+
+# Check for required tools
+declare -a req_tools=("packer" "hcl2json" "sed" "curl" "jq")
+for tool in "${req_tools[@]}"; do
+  if ! command -v "$tool" > /dev/null; then
+    fail "It looks like '${tool}' is not installed; please install it and run this setup script again."
+    exit 1
+  fi
+done
 
 # Variables
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
