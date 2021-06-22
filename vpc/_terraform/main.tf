@@ -36,6 +36,7 @@ module "bastion" {
   extra_userdata             = data.template_file.extra-userdata.rendered
   root_keypair               = var.root_keypair
   bastion_enabled            = var.bastion_enabled
+  ssh_port                   = var.ssh_port
   # s3_vault_bucket            = data.terraform_remote_state.baseline.outputs.s3-vault-bucket
 }
 

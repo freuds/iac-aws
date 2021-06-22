@@ -82,6 +82,11 @@ variable "root_keypair" {
   default = "aws-key"
 }
 
+variable "ssh_port" {
+  type    = number
+  default = 22
+}
+
 variable "GANDI_API_KEY" {}
 
 variable "gandi_domain_name" {

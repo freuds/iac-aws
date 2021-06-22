@@ -77,6 +77,7 @@ data "template_file" "embedded_userdata" {
   vars = {
     region      = var.region
     eip_bastion = aws_eip.eip_bastion.public_ip
+    ssh_port    = var.ssh_port
   }
 }
 //----------------------------
@@ -113,7 +114,9 @@ resource "aws_launch_configuration" "bastion" {
   iam_instance_profile = aws_iam_instance_profile.bastion-instance-profile.name
   security_groups = [
     aws_security_group.bastion.id,
-  aws_security_group.allow-all-egress.id]
+    aws_security_group.allow-all-egress.id
+  ]
+
   lifecycle {
     create_before_destroy = true
   }
