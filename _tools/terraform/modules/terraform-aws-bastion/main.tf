@@ -74,8 +74,11 @@ resource "aws_security_group" "ssh-from-bastion" {
 data "template_file" "embedded_userdata" {
   template = file("${path.module}/init.tpl")
 
+  vars = {
+    region      = var.region
+    eip_bastion = aws_eip.eip_bastion.public_ip
+  }
 }
-
 //----------------------------
 # Userdata init script
 //----------------------------
@@ -120,7 +123,8 @@ resource "aws_launch_configuration" "bastion" {
 # ASG bastion
 //----------------------------
 resource "aws_autoscaling_group" "bastion" {
-  name = replace(aws_launch_configuration.bastion.name, "lc-", "asg-")
+  count                     = var.bastion_enabled ? 1 : 0
+  name                      = replace(aws_launch_configuration.bastion.name, "lc-", "asg-")
   desired_capacity          = var.asg_desired_capacity
   min_size                  = var.asg_min_size
   max_size                  = var.asg_max_size
@@ -211,23 +215,21 @@ resource "aws_iam_instance_profile" "bastion-instance-profile" {
 # IAM role for bastion
 //----------------------------
 resource "aws_iam_role" "bastion-role" {
-  name   = format("%s-bastion-role", var.service)
-  assume_role_policy = data.aws_iam_policy_document.bastion-role.json
-}
+  name               = "bastion-role"
+    assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = ""
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      },
+    ]
+  })
 
-data "aws_iam_policy_document" "bastion-role" {
-  statement {
-    actions = [
-      "sts:AssumeRole"
-    ]
-    principals {
-      type        = "Service"
-      identifiers = ["ec2.amazonaws.com"]
-    }
-    resources = [
-      "*"
-    ]
-  }
 }
 
 //----------------------------

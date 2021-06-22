@@ -9,7 +9,7 @@ variable "env" {
 }
 
 variable "instance_type" {
-  default = "t3.micro"
+  default = "t2.micro"
 }
 
 variable "user_data_file" {
@@ -87,4 +87,10 @@ variable "subnet_ids" {
 variable "root_keypair" {
   type    = string
   default = ""
+}
+
+variable "bastion_enabled" {
+  type        = string
+  default     = true
+  description = "Define if we build bastion or not"
 }
