@@ -10,7 +10,7 @@
     "subnet_id": "subnet-0d969f189aad02f1a",
     "security_group_id": "sg-0cedabc8df636164f",
     "source_ami": "ami-0964eb2dc8b836eb6",
-    "instance_type": "t3.micro",
+    "instance_type": "t2.micro",
     "shared_account": "205168111441,432161212492",
     "box_name": "generic/ubuntu1804",
     "box_version": "3.0.14",
