@@ -1,8 +1,0 @@
----
-- name: copy update_varnish_nodes
-  template:
-    src: update_varnish_nodes.j2
-    dest: /opt/update_varnish_nodes.sh
-    owner: root
-    group: root
-    mode: 0755
