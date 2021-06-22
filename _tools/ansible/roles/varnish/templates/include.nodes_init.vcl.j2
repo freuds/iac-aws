@@ -1,6 +1,0 @@
-{% raw %}
-# Add varnish nodes as backend for sharded varnish cluster
-{{ range $index, $element := (getenv "VARNISH_NODE_IPS" | jsonArray) -}}
-cluster.add_backend(varnish-node-{{ printf "%02d" (add $index 1) }});
-{{ end -}}
-{% endraw %}
