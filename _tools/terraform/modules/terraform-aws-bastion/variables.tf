@@ -82,8 +82,7 @@ variable "subnet_ids" {
   default = []
 }
 
-# variable "s3_vault_bucket" {
-# }
+// variable "s3_vault_bucket" {}
 
 variable "root_keypair" {
   type    = string
