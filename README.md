@@ -28,7 +28,7 @@ Inside file __vpc/_terraform/variables.tf__ , the variable __one_nat_gateway_per
 2. 
 
 Host : bastion.qa.<project_name>.domain.com
-Username : 
+Username : admin
 
 
 ## Tree Structure for tools/libraries
@@ -70,3 +70,41 @@ vpc
     ├── remote-states.tf
     └── provider.tf
 ```
+
+## Packer and AMIs building
+
+For some services, inside __packer__ folder, you can build AMIs from different ISO based OS (Debian / CentOS).
+```
+# Validate or inspect
+./packer.sh validate
+./pacher.sh inspect
+
+# With argument, we build a AMI on AWS
+./packer.sh <-debug>
+
+# With argument -local 
+./pacher.sh -local <qemu> -debug
+```
+Provisioning is done with Ansible.
+
+## Usage
+
+> At first for using a new service, we need to initialise terraform, to generate needed links for terraform then use :
+```
+make init
+```
+
+after that, you can launch a plan
+```
+make plan
+make apply
+# or make apply-force 
+```
+
+## TODO
+
+- [X] : Implement module gandi-dns : up to date AWS NS inside Gandi Zone
+- [ ] : Secure (SSH) instances : modify SG, ssh_port, and packer build 
+- [X] : bastion module : rewrite role_policy
+- [X] : bastion module : fix ipaddress re-assign
+- [ ] : bastion module : add KMS encryption
