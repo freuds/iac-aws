@@ -1,0 +1,5 @@
+---
+# vars file for secure-ssh
+ssh_package: openssh-server
+ssh_server_config: /etc/ssh/sshd_config
+ssh_client_config: /etc/ssh/ssh_config

@@ -5,7 +5,7 @@
   remote_user: "{{ ansible_user | default('debian') }}"
   roles:
     - apt
-    - authorized-keys
+    - secure-ssh
     - aws-cli
     - attach-eip
     - dehydrated

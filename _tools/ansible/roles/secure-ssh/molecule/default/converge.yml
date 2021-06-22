@@ -8,12 +8,7 @@
         update_cache: true
         cache_valid_time: 3600
       when: ansible_os_family == 'Debian'
-
-    - name: Yum cache update
-      yum:
-        update_cache: true
-      when: ansible_os_family == 'RedHat'
-
-    - name: "Include aws-cli role"
+      
+    - name: "Include secure-ssh"
       include_role:
-        name: "aws-cli"
+        name: "secure-ssh"
