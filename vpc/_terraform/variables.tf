@@ -48,7 +48,7 @@ variable "bastion_ami" {
 }
 
 variable "bastion_instance_type" {
-  default     = "t3.micro"
+  default     = "t2.micro"
   type        = string
   description = "EC2 instance type default"
 }
@@ -69,6 +69,12 @@ variable "bastion_asg_max_size" {
   type        = number
   default     = 1
   description = "Define the maximum size for the AutoScalingGroup"
+}
+
+variable "bastion_enabled" {
+  type        = string
+  default     = true
+  description = "Define if we build bastion or not"
 }
 
 variable "root_keypair" {

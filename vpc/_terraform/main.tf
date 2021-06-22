@@ -34,8 +34,9 @@ module "bastion" {
   aws_route53_zone_public_id = module.vpc.public_host_zone
   subnet_ids                 = module.vpc.public_subnets
   extra_userdata             = data.template_file.extra-userdata.rendered
+  root_keypair               = var.root_keypair
+  bastion_enabled            = var.bastion_enabled
   # s3_vault_bucket            = data.terraform_remote_state.baseline.outputs.s3-vault-bucket
-  root_keypair = var.root_keypair
 }
 
 data "template_file" "extra-userdata" {

@@ -15,6 +15,8 @@ root_keypair = "iac-aws-key"
 gandi_domain_name = "freuds.me"
 gandi_alias_ns    = "qa.iac"
 
+bastion_enabled = false
+
 # subnet_priv_tags = {
 #   "kubernetes.io/cluster/qa-eks-cluster" = "shared"
 #   "kubernetes.io/role/internal-elb"      = "1"
