@@ -1,10 +1,8 @@
 ---
-# Include vars-file
 - name: Include vars file
   include_vars:
-    file: "{{ansible_os_family}}.yml"
+    file: "{{ ansible_os_family }}.yml"
 
-# tasks file for secure-ssh
 - name: Ensure sshd service is present
   package:
     name: "{{ ssh_package }}"
@@ -17,7 +15,7 @@
 
 - name: Make sure SSH is more secure.
   lineinfile:
-    dest: /etc/ssh/sshd_config
+    dest: "{{ ssh_server_config }}"
     regexp: "{{ item.regexp }}"
     line: "{{ item.line }}"
     state: present
