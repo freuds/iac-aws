@@ -19,8 +19,8 @@ on: [push, pull_request]
 
 jobs:
 
-  build:
-    name: 'Build'
+  terraform:
+    name: 'Terraform Check'
     runs-on: ubuntu-latest
     steps:
       - name: Setup terraform provider
@@ -31,11 +31,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
 
-  vpc:
-    name: 'Terraform VPC'
-    # runs-on: ubuntu-latest
-    steps:
-      - name: Verify QA
+      - name: Verify VPC QA
         shell: bash
         run: |
           make version
@@ -43,6 +39,13 @@ jobs:
           make plan
         working-directory: vpc/qa/eu-west-1
 
+      # - name: Verify QA
+      #   shell: bash
+      #   run: |
+      #     make version
+      #     make validate
+      #     make plan
+      #   working-directory: build/qa/eu-west-1
       #run: terraform fmt -check
       #run: terraform validate -no-color
       #run: terraform plan -no-color
