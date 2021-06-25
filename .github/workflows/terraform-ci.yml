@@ -22,6 +22,8 @@ jobs:
   terraform:
     name: 'Terraform Check'
     runs-on: ubuntu-latest
+    env:
+      working-directory: ./vpc/qa/eu-west-1
     steps:
       - name: Setup terraform provider
         uses: hashicorp/setup-terraform@v1
@@ -31,13 +33,13 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
 
-      - name: Verify VPC QA
+      - name: Verify VPC
         shell: bash
         run: |
           make version
           make validate
           make plan
-        working-directory: vpc/qa/eu-west-1
+        working-directory: ${{ env.working-directory }}
 
       # - name: Verify QA
       #   shell: bash

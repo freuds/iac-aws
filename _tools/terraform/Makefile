@@ -17,81 +17,59 @@ REPOSITORY ?= ${WORKDIR}charts
 CHART ?= ${WORKDIR}charts/${SERVICE_NAME}
 ARGUMENTS ?=
 
-# Colors work only with $TERM
-ifneq ($(shell type -p tput &> /dev/null),0)
-	red    ?= tput setaf 1; echo $1; tput sgr0;
-	green  ?= tput setaf 2; echo $1; tput sgr0;
-	yellow ?= tput setaf 3; echo $1; tput sgr0;
-	blue   ?= tput setaf 4; echo $1; tput sgr0;
-	purple ?= tput setaf 5; echo $1; tput sgr0;
-	cyan   ?= tput setaf 6; echo $1; tput sgr0;
-	grey   ?= tput setaf 7; echo $1; tput sgr0;
-endif
-
 default: help
 
 .PHONY: help
-
 help:	## Show this help.
 	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'
 
+.PHONY: init
 init:	## Make terraform init
-	@$(call yellow, "Init Terraform")
 	@make symlinks
 	@terraform init -reconfigure -backend-config=.terraform-config
 
+.PHONY: plan
 plan:	## Make terraform plan
-	@$(call cyan, "Plan Terraform")
 	@terraform plan
 
+.PHONY: apply
 apply:	## Make terraform apply
-	@$(call green, "Apply Terraform")
 	@terraform apply
 
 apply-force: ## Make terraform apply --auto-approve
-	@$(call green, "Auto-Apply Terraform")
 	@terraform apply --auto-approve
 
 destroy:  ## Plan terraform destroy
-	@$(call red, "Plan Destroy Terraform")
 	@terraform plan -destroy
 
 mdestroy: ## Make terraform destroy
-	@$(call red, "Destroy Terraform")
 	@terraform plan -destroy
 	@terraform apply -destroy
 
+.PHONY: output
 output:	## Make terraform output
-	@$(call cyan, "Output Terraform")
 	@terraform output
 
 validate:	## Make terraform validate
-	@$(call cyan, "Validate Terraform")
 	@terraform validate
 
 list:	## Make terraform state list
-	@$(call cyan, "List Terraform state")
 	@make symlinks
 	@terraform state list
 
 providers:	## Make terraform state list
-	@$(call cyan, "List Providers configuration")
 	@terraform providers
 
 install:  ## Make tfenv install
-	@$(call cyan, "Terraform Install")
 	@tfenv install $(shell cat .terraform-version)
 
 use:      ## Make tfenv use
-	@$(call cyan, "Terraform Use version")
 	@tfenv use $(shell cat .terraform-version)
 
 version:  ## Show terraform version
-	@$(call cyan, "Terraform version")
 	@terraform version
 
 cleanlinks:
-	@$(call cyan, "Clean links")
 	@if [ -L _backend.tf ] ; then unlink _backend.tf; fi
 	@if [ -L _provider.tf ] ; then unlink _provider.tf; fi
 	@if [ -L _main.tf ] ; then unlink _main.tf; fi
@@ -103,7 +81,6 @@ cleanlinks:
 	@if [ -L irsa.tf ] ; then unlink irsa.tf; fi
 
 symlinks:
-	@$(call cyan, "Make links")
 	@if [ ! -L _backend.tf ] ; then ln -s ../../_terraform/backend.tf _backend.tf; fi
 	@if [ ! -L _provider.tf ] ; then ln -s ../../_terraform/provider.tf _provider.tf; fi
 	@if [ ! -L _main.tf ] ; then ln -s ../../_terraform/main.tf _main.tf; fi
