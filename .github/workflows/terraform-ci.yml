@@ -20,9 +20,9 @@ jobs:
     runs-on: ubuntu-latest
 
     defaults:
-    run:
-      shell: bash
-      working-directory: iac-aws
+      run:
+        shell: bash
+        working-directory: iac-aws
 
     steps:
     - uses: actions/checkout@v2
