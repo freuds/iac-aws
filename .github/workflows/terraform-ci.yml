@@ -25,12 +25,16 @@ jobs:
         working-directory: /home/runner/work/iac-aws/iac-aws
 
     steps:
-    - uses: actions/checkout@v2
-    - uses: hashicorp/setup-terraform@v1
+
+    - name: Setup terraform provider
+      uses: hashicorp/setup-terraform@v1
       with:
         terraform_version: 1.0.0
         cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
-
+        
+    - name: Checkout
+      uses: actions/checkout@v2
+    
     - name: Terraform CI
       run: |
         cd vpc/qa/eu-ewst-1 ; make init ; terraform fmt -check
