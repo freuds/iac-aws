@@ -17,14 +17,17 @@ REPOSITORY ?= ${WORKDIR}charts
 CHART ?= ${WORKDIR}charts/${SERVICE_NAME}
 ARGUMENTS ?=
 
-# Colors
-grey = tput setaf 7; echo $1; tput sgr0;
-red = tput setaf 1; echo $1; tput sgr0;
-green = tput setaf 2; echo $1; tput sgr0;
-yellow = tput setaf 3; echo $1; tput sgr0;
-blue = tput setaf 4; echo $1; tput sgr0;
-purple = tput setaf 5; echo $1; tput sgr0;
-cyan = tput setaf 6; echo $1; tput sgr0;
+# Colors work only with $TERM
+COLORS = type -p tput &> /dev/null || 0
+# Colorse
+
+red    ?= tput setaf 1; echo $1; tput sgr0;
+green  ?= tput setaf 2; echo $1; tput sgr0;
+yellow ?= tput setaf 3; echo $1; tput sgr0;
+blue   ?= tput setaf 4; echo $1; tput sgr0;
+purple ?= tput setaf 5; echo $1; tput sgr0;
+cyan   ?= tput setaf 6; echo $1; tput sgr0;
+grey   ?= tput setaf 7; echo $1; tput sgr0;
 
 default: help
 
