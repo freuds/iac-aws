@@ -32,24 +32,20 @@ jobs:
         cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
         #terraform_wrapper: false
 
-    - run: echo ${{ steps.plan.outputs.stdout }}
-    - run: echo ${{ steps.plan.outputs.stderr }}
-    - run: echo ${{ steps.plan.outputs.exitcode }}
-
     - name: Checkout
       uses: actions/checkout@v2
 
     # Basic checkout
-    - name: Checkout QA
-      uses: ./
-      with:
-        ref: vpc/qa/eu-west-1
-        path: vpc-qa
     - name: Verify basic
       shell: bash
       run: |
-        cd ./vpc/qa/eu-ewst-1 ; make init
+        make init
+      working-directory: vpc/qa/eu-west-1
 
+    - run: echo ${{ steps.plan.outputs.stdout }}
+    - run: echo ${{ steps.plan.outputs.stderr }}
+    - run: echo ${{ steps.plan.outputs.exitcode }}
+    
       #run: terraform fmt -check
       #run: terraform validate -no-color
       #run: terraform plan -no-color
