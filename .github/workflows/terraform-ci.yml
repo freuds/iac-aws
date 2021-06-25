@@ -19,11 +19,11 @@ jobs:
     name: 'Terraform'
     runs-on: ubuntu-latest
     environment: qa
-  
-    defaults:
-    run:
-      shell: bash
-      working-directory: vpc/qa/eu-ewst-1
+
+    # defaults:
+    # run:
+    #   shell: bash
+    #   working-directory: vpc/qa/eu-ewst-1
 
     steps:
     - uses: actions/checkout@v2
@@ -34,7 +34,7 @@ jobs:
 
     - name: Terraform CI
       run: |
-        make init
+        cd vpc/${{ environment }}/eu-ewst-1 ; make init ; terraform fmt -check
 
     # make init
     # terraform init
