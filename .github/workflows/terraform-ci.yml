@@ -33,6 +33,8 @@ jobs:
 
     - name: Terraform CI
       run: |
+        pwd
+        ls -l
         cd vpc/qa/eu-ewst-1 ; make init ; terraform fmt -check
 
     # make init
