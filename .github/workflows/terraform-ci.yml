@@ -31,7 +31,11 @@ jobs:
         terraform_version: 1.0.0
         cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
         terraform_wrapper: false
-        
+
+    - run: echo ${{ steps.plan.outputs.stdout }}
+    - run: echo ${{ steps.plan.outputs.stderr }}
+    - run: echo ${{ steps.plan.outputs.exitcode }}
+
     - name: Checkout
       uses: actions/checkout@v2
       
