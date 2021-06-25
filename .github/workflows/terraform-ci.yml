@@ -18,8 +18,6 @@ jobs:
   terraform:
     name: 'Terraform'
     runs-on: ubuntu-latest
-    env:
-      environment: qa
 
     # defaults:
     # run:
@@ -35,7 +33,7 @@ jobs:
 
     - name: Terraform CI
       run: |
-        cd vpc/${{ environment }}/eu-ewst-1 ; make init ; terraform fmt -check
+        cd vpc/qa/eu-ewst-1 ; make init ; terraform fmt -check
 
     # make init
     # terraform init
