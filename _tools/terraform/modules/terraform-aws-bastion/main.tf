@@ -2,7 +2,7 @@
 # SG bastion ssh ingress
 //----------------------------
 resource "aws_security_group" "bastion" {
-  name        = "sgp-${var.env}-${var.service}"
+  name        = format("sgp-%s-%s", var.env, var.service)
   vpc_id      = var.vpc_id
   description = "Bastion security group (only SSH inbound access is allowed)"
   ingress {
