@@ -87,7 +87,9 @@ variable "ssh_port" {
   default = 22
 }
 
-variable "GANDI_API_KEY" {}
+variable "GANDI_API_KEY" {
+  description = "Gandi API Key defined in Terraform Cloud environment"
+}
 
 variable "gandi_domain_name" {
   default     = "domain.com"
@@ -105,4 +107,10 @@ variable "gandi_aws_ns" {
   default     = []
   type        = list(string)
   description = "AWS API Route53 for delegation domain"
-} 
+}
+
+variable "cf_certificate_enabled" {
+  default     = true
+  type = bool
+  description = "Enable or not CloudFront SSL certificate"
+}

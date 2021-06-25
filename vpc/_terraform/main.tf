@@ -11,6 +11,7 @@ module "vpc" {
   internal_domain_name   = var.internal_domain_name
   external_domain_name   = var.external_domain_name
   one_nat_gateway_per_az = var.one_nat_gateway_per_az
+  cf_certificate_enabled = var.cf_certificate_enabled
 }
 
 module "gandi-dns" {

@@ -78,8 +78,18 @@ variable "subnet_priv_tags" {
 
 variable "s3_endpoint_enabled" {
   default = true
+  type = bool
+  description = "Create or not the S3 Endpoint inside the VPC"
 }
 
 variable "dynamodb_endpoint_enabled" {
   default = false
+  type = bool
+  description = "Create or not the dynamoDB Endpoint inside the VPC"
+}
+
+variable "cf_certificate_enabled" {
+  default = true
+  type = bool
+  description = "Enable or not CloudFront SSL certificate"
 }

@@ -42,17 +42,17 @@ output "private_subnets_cidr" {
 #   value = aws_elasticache_subnet_group.ec-subnet-group.name
 # }
 
-# output "ssl_cert_arn" {
-#   value = aws_acm_certificate.cert.arn
-# }
+output "ssl_cert_arn" {
+  value = aws_acm_certificate.cert.arn
+}
 
-# locals {
-#   prod_ssl_cert_arn = var.env == "prod" ? data.aws_acm_certificate.prod.0.arn : ""
-# }
+// locals {
+//   prod_ssl_cert_arn = var.env == "prod" ? data.aws_acm_certificate.prod.0.arn : ""
+// }
 
-# output "prod_ssl_cert_arn" {
-#   value = local.prod_ssl_cert_arn
-# }
+// output "prod_ssl_cert_arn" {
+//   value = local.prod_ssl_cert_arn
+// }
 
 # output "vpc_dns_srv_ip" {
 #   value = cidrhost(var.cidr_block, 2)

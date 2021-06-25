@@ -9,7 +9,7 @@ external_domain_name = "qa.iac.freuds.me"
 
 one_nat_gateway_per_az = false
 
-bastion_ami  = "ami-008a529621da89825"
+bastion_ami  = "ami-08ff4525d1ad50904"
 root_keypair = "iac-aws-key"
 
 gandi_domain_name = "freuds.me"
