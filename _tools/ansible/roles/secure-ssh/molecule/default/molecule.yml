@@ -6,7 +6,6 @@ driver:
 lint: |
   set -e
   yamllint .
-  ansible-lint
 platforms:
   - name: instance
     image: geerlingguy/docker-${MOLECULE_DISTRO:-centos8}-ansible:latest
@@ -17,5 +16,7 @@ platforms:
     pre_build_image: true
 provisioner:
   name: ansible
+  lint:
+    name: ansible-lint
 verifier:
   name: ansible
