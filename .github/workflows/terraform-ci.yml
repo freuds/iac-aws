@@ -30,14 +30,15 @@ jobs:
         with:
           terraform_version: 1.0.0
           cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
-      - name: Checkout Code
+      - name: Checkout Source
         uses: actions/checkout@v2
 
-      - name: Verify VPC
+      - name: vpc-qa-eu-west-1
         shell: bash
         run: |
-          make version
+          make init
           make validate
+          make version
           make plan
         working-directory: ${{ env.working-directory }}
 
