@@ -19,10 +19,10 @@ jobs:
     name: 'Terraform'
     runs-on: ubuntu-latest
 
-    # defaults:
-    # run:
-    #   shell: bash
-    #   working-directory: vpc/qa/eu-ewst-1
+    defaults:
+    run:
+      shell: bash
+      working-directory: iac-aws
 
     steps:
     - uses: actions/checkout@v2
