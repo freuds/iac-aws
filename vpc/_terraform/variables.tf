@@ -111,6 +111,6 @@ variable "gandi_aws_ns" {
 
 variable "cf_certificate_enabled" {
   default     = true
-  type = bool
+  type        = bool
   description = "Enable or not CloudFront SSL certificate"
 }

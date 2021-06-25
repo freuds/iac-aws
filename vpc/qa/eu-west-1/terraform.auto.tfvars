@@ -16,7 +16,7 @@ gandi_domain_name = "freuds.me"
 gandi_alias_ns    = "qa.iac"
 
 bastion_enabled = false
-ssh_port = 2345
+ssh_port        = 2345
 
 # subnet_priv_tags = {
 #   "kubernetes.io/cluster/qa-eks-cluster" = "shared"

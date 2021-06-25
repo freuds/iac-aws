@@ -12,48 +12,36 @@ on: [push, pull_request]
 #     - '_tools/terraform/modules/**'
 #   pull_request:
 #     branches:
-#     - main
+#     - '*'
+#     paths:
+#     - 'vpc/**'
+#     - '_tools/terraform/modules/**'
 
 jobs:
   terraform:
     name: 'Terraform'
     runs-on: ubuntu-latest
 
-   # defaults:
-     # run:
-      #  working-directory: ${{ env.tf_actions_working_dir }}
-
     steps:
-
     - name: Setup terraform provider
       uses: hashicorp/setup-terraform@v1
       with:
         terraform_version: 1.0.0
         cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
-        #terraform_wrapper: false
 
-    - name: Checkout
+    - name: Checkout Code
       uses: actions/checkout@v2
 
-    # Basic checkout
-    - name: Verify basic
+    - name: Verify QA
       shell: bash
       run: |
-        make init
+        make help
       working-directory: vpc/qa/eu-west-1
 
-    - run: echo ${{ steps.plan.outputs.stdout }}
-    - run: echo ${{ steps.plan.outputs.stderr }}
-    - run: echo ${{ steps.plan.outputs.exitcode }}
-    
       #run: terraform fmt -check
       #run: terraform validate -no-color
       #run: terraform plan -no-color
       #continue-on-error: true
-  
-    #- name: Terraform CI
-     # run: |
-     #   cd vpc/qa/eu-ewst-1 ; make init ; terraform fmt -check
 
     # make init
     # terraform init

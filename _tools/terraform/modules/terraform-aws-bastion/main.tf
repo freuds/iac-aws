@@ -218,8 +218,8 @@ resource "aws_iam_instance_profile" "bastion-instance-profile" {
 # IAM role for bastion
 //----------------------------
 resource "aws_iam_role" "bastion-role" {
-  name               = "bastion-role"
-    assume_role_policy = jsonencode({
+  name = "bastion-role"
+  assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
