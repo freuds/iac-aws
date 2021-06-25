@@ -1,6 +1,6 @@
 #     - https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets
 
-name: Terraform VPC
+name: Terraform
 
 on: [push, pull_request]
 # on:
@@ -18,25 +18,30 @@ on: [push, pull_request]
 #     - '_tools/terraform/modules/**'
 
 jobs:
-  terraform:
-    name: 'Terraform'
+
+  build:
+    name: 'Build'
     runs-on: ubuntu-latest
-
     steps:
-    - name: Setup terraform provider
-      uses: hashicorp/setup-terraform@v1
-      with:
-        terraform_version: 1.0.0
-        cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+      - name: Setup terraform provider
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.0.0
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+      - name: Checkout Code
+        uses: actions/checkout@v2
 
-    - name: Checkout Code
-      uses: actions/checkout@v2
-
-    - name: Verify QA
-      shell: bash
-      run: |
-        make help
-      working-directory: vpc/qa/eu-west-1
+  vpc:
+    name: 'Terraform VPC'
+    # runs-on: ubuntu-latest
+    steps:
+      - name: Verify QA
+        shell: bash
+        run: |
+          make version
+          make validate
+          make plan
+        working-directory: vpc/qa/eu-west-1
 
       #run: terraform fmt -check
       #run: terraform validate -no-color
