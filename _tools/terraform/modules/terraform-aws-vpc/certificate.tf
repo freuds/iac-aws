@@ -17,6 +17,11 @@ resource "aws_acm_certificate" "cert" {
 data "aws_route53_zone" "cert" {
   name         = var.external_domain_name
   private_zone = false
+
+  # depends on route53 zone public
+  depends_on = [
+    aws_route53_zone.public
+  ]
 }
 
 resource "aws_route53_record" "cert" {
