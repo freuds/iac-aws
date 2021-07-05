@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/usr/bin/env bash
 set -euo pipefail
 
 info() {
@@ -67,7 +67,9 @@ TERRAFORM_VERSION=$(terraform version -json | jq -r '.terraform_version')
 ORGANIZATION_NAME=$(jq -r '.organization_name' organization.json)
 ADMIN_OWNER=$(jq -r '.admin_email' organization.json)
 
+######################
 # create organization
+######################
 create_organization() {
   local result=0
   local response
@@ -76,7 +78,7 @@ create_organization() {
     --silent \
     --header "Content-Type: application/vnd.api+json" \
     --header "Authorization: Bearer $TOKEN" \
-    --data @- << REQUEST_BODY
+    --data @- << REQ_CREATE_ORG
 {
     "data": {
       "type": "organizations",
@@ -86,9 +88,8 @@ create_organization() {
       }
     }
 }
-REQUEST_BODY
+REQ_CREATE_ORG
 )
-
   if [[ $(echo $response | jq -r '.errors') != null ]]; then
     if [[ $(echo $response | jq -r '.errors[].status') == 422 ]]; then
       info "$(echo $response | jq --raw-output .'errors[].detail')"
@@ -100,7 +101,9 @@ REQUEST_BODY
   fi
 }
 
-# Check if workspace exists already
+######################
+# Create workspace if needed
+######################
 create_workspace() {
   local result
   local response
@@ -110,7 +113,7 @@ create_workspace() {
     --silent \
     --header "Content-Type: application/vnd.api+json" \
     --header "Authorization: Bearer $TOKEN" \
-    --data @- << REQUEST_BODY
+    --data @- << REQ_CREATE_WKS
 {
     "data": {
       "type": "workspaces",
@@ -118,20 +121,53 @@ create_workspace() {
         "name": "${WORKSPACE_NAME}",
         "terraform-version": "${TERRAFORM_VERSION}",
         "working-directory": "${WORKING_DIRECTORY}",
-        "description": "Workpace ${_ENV} for ${_SERVICE} on ${_REGION}"
+        "description": "${WORKSPACE_DESCRIPTION}"
       }
     }
 }
-REQUEST_BODY
+REQ_CREATE_WKS
 )
   if [[ $(echo $response | jq -r '.errors') != null ]]; then
     if [[ $(echo $response | jq -r '.errors[].status') == 422 ]]; then
-      info "$(echo $response | jq --raw-output .'errors[].detail')"
+      update_workspace
     else
       fail "An unknown error occurred: ${response}"
     fi
   elif [[ $(echo $response | jq -r '.data.type') == "workspaces" ]]; then
     success "Workspace $(echo $response | jq -r '.data.attributes.name') created !"
+  fi
+}
+
+######################
+# Updarte workspace
+######################
+update_workspace() {
+  local result
+  local response
+  local workdir
+  response=$(curl https://$HOST/api/v2/organizations/${ORGANIZATION_NAME}/workspaces/${WORKSPACE_NAME} \
+    --request PATCH \
+    --silent \
+    --header "Content-Type: application/vnd.api+json" \
+    --header "Authorization: Bearer $TOKEN" \
+    --data @- << REQ_UPDATE_WKS
+{
+    "data": {
+      "type": "workspaces",
+      "attributes": {
+        "name": "${WORKSPACE_NAME}",
+        "terraform-version": "${TERRAFORM_VERSION}",
+        "working-directory": "${WORKING_DIRECTORY}",
+        "description": "${WORKSPACE_DESCRIPTION}"
+      }
+    }
+}
+REQ_UPDATE_WKS
+)
+  if [[ $(echo $response | jq -r '.errors') != null ]]; then
+      fail "An unknown error occurred: ${response}"
+  elif [[ $(echo $response | jq -r '.data.type') == "workspaces" ]]; then
+    success "Workspace : $(echo $response | jq -r '.data.attributes.name') updated !"
   fi
 }
 
@@ -189,6 +225,7 @@ do
 
   WORKSPACE_NAME="${_SERVICE}-${_ENV}-${_REGION}"
   WORKING_DIRECTORY="${_SERVICE}/${_ENV}/${_REGION}"
+  WORKSPACE_DESCRIPTION="Workspace : ${_ENV^^} for ${_SERVICE^^} on ${_REGION^^}"
 
   # check if .terraform-config is existing and correct
   if ! grep "name = \"${WORKSPACE_NAME}\"" $CONFIG_TF 2>&1 >/dev/null ; then
@@ -208,8 +245,8 @@ do
 done
 
 # Commit all changes
-echo "Commit all changes ?"
-pause_for_confirmation
-git commit -v -a -s --no-edit --amend
+# echo "Commit all changes ?"
+# pause_for_confirmation
+# git commit -v -a -s --no-edit --amend
 
 exit 0
