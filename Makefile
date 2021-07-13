@@ -4,17 +4,17 @@ export PATH := $(PATH):/usr/local/bin
 
 SHELL:=/bin/bash -eu
 
-help:	## Show this help.
+help:			## Show this help.
 	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'
 
-tf-init:   ## Create Organisation and workspaces on TF Cloud
+tf-init:   		## Create Organisation and workspaces on TF Cloud
 	@_tools/scripts/init-tf-cloud.sh
 
-fmt-global:   ## formate tous les .tf file
+fmt-global:   		## Apply terraform fmt recursively all .tf file
 	@terraform fmt -recursive
 
-tf-version-show:
+tf-version-show: 	## Show current version in all .terraform-version files
 	@find . -name ".terraform-version" -exec cat {} \;
 
-tf-version-fix:
+tf-version-fix:		## Apply same version in all .terraform-version files
 	@_tools/scripts/uniformize-tf-version.sh
