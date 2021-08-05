@@ -14,7 +14,7 @@ fmt-global:   		## Apply terraform fmt recursively all .tf file
 	@terraform fmt -recursive
 
 tf-version-show: 	## Show current version in all .terraform-version files
-	@find . -name ".terraform-version" -exec cat {} \;
+	@_tools/scripts/uniformize-tf-version.sh -show
 
-tf-version-fix:		## Apply same version in all .terraform-version files
-	@_tools/scripts/uniformize-tf-version.sh
+tf-version-fix:		## Apply the same version in all .terraform-version files
+	@_tools/scripts/uniformize-tf-version.sh -fix
