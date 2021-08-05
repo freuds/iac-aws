@@ -52,8 +52,8 @@ do
   # check if .terraform-version is existing and correct
   if [ "${VERSION_CUR}" != "${VERSION_REF}" ] && [ "${FIX}" = 1 ] ; then
       info "Need to change this file ^^^"
-      echo $VERSION_REF > $VERSION_TF
-      chmod 0644 $VERSION_TF
+      echo "${VERSION_REF}" > "${TF_VERSION_FILE}"
+      chmod 0644 "${TF_VERSION_FILE}"
   fi
 
 done
