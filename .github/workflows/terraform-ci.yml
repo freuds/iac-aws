@@ -20,9 +20,10 @@ on: [push, pull_request]
 jobs:
 
   terraform:
-    name: 'Terraform Check'
+    name: 'Terraform VPC'
     runs-on: ubuntu-latest
     env:
+      environment: qa
       working-directory: ./vpc/qa/eu-west-1
     steps:
       - name: Setup terraform provider
@@ -33,6 +34,15 @@ jobs:
       - name: Checkout Source
         uses: actions/checkout@v2
 
+      - name: baselinec-qa-eu-west-1
+        shell: bash
+        run: |
+          make init
+          make validate
+          make version
+          make plan
+        working-directory: ./baseline/${{ env.environment }}/eu-west-1
+
       - name: vpc-qa-eu-west-1
         shell: bash
         run: |
@@ -40,7 +50,7 @@ jobs:
           make validate
           make version
           make plan
-        working-directory: ${{ env.working-directory }}
+        working-directory: ./vpc/${{ env.environment }}/eu-west-1
 
       # - name: Verify QA
       #   shell: bash
