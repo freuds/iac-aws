@@ -2,20 +2,26 @@
 
 name: Terraform
 
-on: [push, pull_request]
-# on:
-#   push:
-#     branches:
-#     - main
-#     paths:
-#     - 'vpc/**'
-#     - '_tools/terraform/modules/**'
-#   pull_request:
-#     branches:
-#     - '*'
-#     paths:
-#     - 'vpc/**'
-#     - '_tools/terraform/modules/**'
+# on: [push, pull_request]
+on:
+  push:
+    branches:
+    - main
+    paths:
+    - 'baseline/**'
+    - 'build/**'
+    - 'myapp/**'
+    - 'vpc/**'
+    - '_tools/terraform/modules/**'
+  pull_request:
+    branches:
+    - '*'
+    paths:
+    - 'baseline/**'
+    - 'build/**'
+    - 'myapp/**'
+    - 'vpc/**'
+    - '_tools/terraform/modules/**'
 
 jobs:
 
@@ -24,7 +30,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       environment: qa
-      # working-directory: ./vpc/qa/eu-west-1
     steps:
       - name: Setup terraform provider
         uses: hashicorp/setup-terraform@v1
@@ -48,7 +53,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       environment: qa
-      # working-directory: ./vpc/qa/eu-west-1
     steps:
       - name: Setup terraform provider
         uses: hashicorp/setup-terraform@v1
@@ -66,6 +70,30 @@ jobs:
           make version
           make plan
         working-directory: ./baseline/${{ env.environment }}/eu-west-1
+
+  terraform-myapp:
+    name: 'TF Myapp'
+    runs-on: ubuntu-latest
+    env:
+      environment: qa
+    steps:
+      - name: Setup terraform provider
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.0.0
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+      - name: Checkout Source
+        uses: actions/checkout@v2
+
+      - name: myapp-qa-eu-west-1
+        shell: bash
+        run: |
+          make init
+          make validate
+          make version
+          make plan
+        working-directory: ./myapp/${{ env.environment }}/eu-west-1
+
       # - name: Verify QA
       #   shell: bash
       #   run: |
