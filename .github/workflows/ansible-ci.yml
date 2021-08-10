@@ -5,16 +5,18 @@ on:
     branches:
     - main
     paths:
+    - '.github/**'
     - '_tools/ansible/**'
   pull_request:
     branches:
-    - main
+    - '*'
     paths:
+    - '.github/**'
     - '_tools/ansible/**'
 
 jobs:
   aws-cli:
-    name: aws-cli role
+    name: AWScli Role
     runs-on: ubuntu-latest
 
     strategy:
