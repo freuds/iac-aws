@@ -1,3 +1,8 @@
+variable "env" {
+  default     = ""
+  description = "Environment"
+}
+
 variable "lambda_name" {
   default     = ""
   description = "Name of lambda function"

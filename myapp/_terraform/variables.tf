@@ -4,6 +4,12 @@ variable "env" {
   description = "Environment"
 }
 
+variable "service" {
+  type        = string
+  default     = "myapp"
+  description = "Service Name"
+}
+
 variable "region" {
   type        = string
   default     = "eu-west-1"
@@ -26,4 +32,10 @@ variable "lambda_handler" {
   default     = "index"
   type        = string
   description = "handler for Lambda function : .handler as suffix"
+}
+
+variable "function_name" {
+  default     = ""
+  type        = string
+  description = "Function name for Api Gateway"
 }

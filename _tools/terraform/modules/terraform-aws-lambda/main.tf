@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "lambda_bucket" {
-  bucket        = format("lambda-bucket-%s", var.lambda_name)
+  bucket        = format("lambda-bucket-%s-%s", var.env, var.lambda_name)
   acl           = "private"
   force_destroy = var.force_destroy
 }
@@ -23,7 +23,7 @@ resource "aws_s3_bucket_object" "this_lambda" {
 
 // build lambda function
 resource "aws_lambda_function" "this_lambda_name" {
-  function_name = var.lambda_name
+  function_name = format("%s-%s", var.env, var.lambda_name)
 
   s3_bucket = aws_s3_bucket.lambda_bucket.id
   s3_key    = aws_s3_bucket_object.this_lambda.key
@@ -37,12 +37,12 @@ resource "aws_lambda_function" "this_lambda_name" {
 }
 
 resource "aws_cloudwatch_log_group" "this_lambda_name" {
-  name = "/aws/lambda/${aws_lambda_function.this_lambda_name.function_name}"
+  name              = "/aws/lambda/${aws_lambda_function.this_lambda_name.function_name}"
   retention_in_days = 30
 }
 
 resource "aws_iam_role" "lambda_exec" {
-  name = format("role-lambda-%s", var.lambda_name)
+  name = format("role-lambda-%s-%s", var.env, var.lambda_name)
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"

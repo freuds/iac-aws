@@ -8,8 +8,15 @@ module "lambda" {
   lambda_runtime = var.lambda_runtime
 }
 
+data "aws_lambda_function" "helloword" {
+  function_name = format("%s-%s", var.env, var.lambda_name)
+}
+
 module "apigateway" {
-  source         = "git@github.com:xxxxxxxxxxxxxx/terraform-aws-apitgateway.git"
-  env            = var.env
-  region         = var.region
+  source          = "git@github.com:xxxxxxxxxxxxxx/terraform-aws-apitgateway.git"
+  env             = var.env
+  service         = var.service
+  region          = var.region
+  integration_uri = data.aws_lambda_function.helloword.invoke_arn
+  function_name   = data.aws_lambda_function.helloword.function_name
 }
