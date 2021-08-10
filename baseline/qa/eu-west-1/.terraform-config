@@ -1,0 +1,3 @@
+workspaces {
+    name = "baseline-qa-eu-west-1"
+}
