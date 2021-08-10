@@ -8,6 +8,7 @@ on:
     branches:
     - main
     paths:
+    - '.github/**'
     - 'baseline/**'
     - 'build/**'
     - 'myapp/**'
@@ -17,6 +18,7 @@ on:
     branches:
     - '*'
     paths:
+    - '.github/**'
     - 'baseline/**'
     - 'build/**'
     - 'myapp/**'
