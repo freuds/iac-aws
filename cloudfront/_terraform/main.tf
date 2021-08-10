@@ -1,5 +1,5 @@
 module "cdn-api" {
-  source                   = "git@github.com:born2scale/terraform-cdn-api.git"
+  source                   = "git@github.com:xxxxxxxx/terraform-cdn-api.git"
   env                      = var.env
   region                   = var.region
   s3_origins_paths         = var.s3_origins_paths
@@ -24,30 +24,30 @@ module "cdn-api" {
   api_records              = var.api_records
 }
 
-module "cdn-assets" {
-  source = "git@github.com:born2scale/terraform-cdn-assets.git"
-  env    = var.env
-  region = var.region
-  s3_origins = {
-    statics = aws_s3_bucket.static-bucket.id,
-    media   = aws_s3_bucket.media-bucket.id,
-  }
-  s3_origins_paths           = var.s3_origins_paths
-  s3_bucket_logs             = data.terraform_remote_state.baseline.outputs.s3_access_log_bucket_id
-  default_ttl                = var.assets_default_ttl
-  max_ttl                    = var.assets_max_ttl
-  price_class                = var.assets_price_class
-  allowed_methods            = var.assets_allowed_methods
-  cached_methods             = var.assets_cached_methods
-  certificate_arn            = data.aws_acm_certificate.assets_cloudfront_certificate.arn
-  comment_OAI                = var.assets_comment_OAI
-  aliases_cloudfront         = var.assets_aliases_cloudfront
-  zone_id                    = data.terraform_remote_state.vpc.outputs.r53_public_zone_id
-  asset_record               = var.asset_record
-  enable_custom_404          = var.assets_enable_custom_404
-  custom_404_caching_min_ttl = var.assets_404_caching_min_ttl
-  custom_404_page_path       = var.assets_404_page_path
-}
+// module "cdn-assets" {
+//   source = "git@github.com:xxxxxxx/terraform-cdn-assets.git"
+//   env    = var.env
+//   region = var.region
+//   s3_origins = {
+//     statics = aws_s3_bucket.static-bucket.id,
+//     media   = aws_s3_bucket.media-bucket.id,
+//   }
+//   s3_origins_paths           = var.s3_origins_paths
+//   s3_bucket_logs             = data.terraform_remote_state.baseline.outputs.s3_access_log_bucket_id
+//   default_ttl                = var.assets_default_ttl
+//   max_ttl                    = var.assets_max_ttl
+//   price_class                = var.assets_price_class
+//   allowed_methods            = var.assets_allowed_methods
+//   cached_methods             = var.assets_cached_methods
+//   certificate_arn            = data.aws_acm_certificate.assets_cloudfront_certificate.arn
+//   comment_OAI                = var.assets_comment_OAI
+//   aliases_cloudfront         = var.assets_aliases_cloudfront
+//   zone_id                    = data.terraform_remote_state.vpc.outputs.r53_public_zone_id
+//   asset_record               = var.asset_record
+//   enable_custom_404          = var.assets_enable_custom_404
+//   custom_404_caching_min_ttl = var.assets_404_caching_min_ttl
+//   custom_404_page_path       = var.assets_404_page_path
+// }
 
 data "aws_acm_certificate" "api_cloudfront_certificate" {
   provider = aws.aws-global

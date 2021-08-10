@@ -18,12 +18,12 @@ data "terraform_remote_state" "vpc" {
   }
 }
 
-data "terraform_remote_state" "varnish" {
-  backend = "remote"
-  config = {
-    organization = var.organization
-    workspaces = {
-      name = "varnish-${var.env}-${var.region}"
-    }
-  }
-}
+// data "terraform_remote_state" "varnish" {
+//   backend = "remote"
+//   config = {
+//     organization = var.organization
+//     workspaces = {
+//       name = "varnish-${var.env}-${var.region}"
+//     }
+//   }
+// }
