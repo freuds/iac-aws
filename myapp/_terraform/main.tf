@@ -10,6 +10,10 @@ module "lambda" {
 
 data "aws_lambda_function" "helloword" {
   function_name = format("%s-%s", var.env, var.lambda_name)
+
+  depends_on = [
+    module.lambda.function_name
+  ]
 }
 
 module "apigateway" {
@@ -19,4 +23,5 @@ module "apigateway" {
   region          = var.region
   integration_uri = data.aws_lambda_function.helloword.invoke_arn
   function_name   = data.aws_lambda_function.helloword.function_name
+
 }
