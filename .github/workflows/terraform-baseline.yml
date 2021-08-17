@@ -19,10 +19,11 @@ on:
 jobs:
 
   terraform-baseline:
-    name: 'Terraform Baseline'
+    name: 'TF Baseline QA'
     runs-on: ubuntu-latest
     env:
       environment: qa
+      region: eu-west-1
     steps:
       - name: Setup terraform provider
         uses: hashicorp/setup-terraform@v1
@@ -32,11 +33,11 @@ jobs:
       - name: Checkout Source
         uses: actions/checkout@v2
 
-      - name: baseline-qa-eu-west-1
+      - name: baseline-${{ env.environment }}-${{ env.region }}
         shell: bash
         run: |
           make init
           make validate
           make version
           make plan
-        working-directory: ./baseline/${{ env.environment }}/eu-west-1
+        working-directory: ./baseline/${{ env.environment }}/${{ env.region }}
