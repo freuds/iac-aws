@@ -1,0 +1,51 @@
+#     - https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets
+
+name: Terraform VPC
+
+on:
+  push:
+    branches:
+    - main
+    paths:
+    - '.github/**'
+    - 'vpc/**'
+    - '_tools/terraform/modules/**'
+  pull_request:
+    branches:
+    - '*'
+    paths:
+    - '.github/**'
+    - 'vpc/**'
+    - '_tools/terraform/modules/**'
+
+jobs:
+
+  terraform-vpc:
+    name: 'TF VPC QA'
+    runs-on: ubuntu-latest
+    env:
+      environment: qa
+      region: eu-west-1
+    steps:
+      - name: Setup terraform provider
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.0.0
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+      - name: Checkout Source
+        uses: actions/checkout@v2
+
+      - name: vpc-${{ env.environment }}-${{ env.region }}
+        shell: bash
+        run: |
+          make init
+          make validate
+          make version
+          make plan
+        working-directory: ./vpc/${{ env.environment }}/${{ env.region }}
+
+    #   # On push to main, build or change infrastructure according to Terraform configuration files
+    #   # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
+    # - name: Terraform Apply
+    #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    #   run: terraform apply -auto-approve
