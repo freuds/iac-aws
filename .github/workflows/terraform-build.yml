@@ -1,0 +1,44 @@
+#     - https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets
+
+name: Terraform Build
+
+on:
+  push:
+    branches:
+    - main
+    paths:
+    - '.github/**'
+    - 'build/**'
+    - '_tools/terraform/modules/**'
+  pull_request:
+    branches:
+    - '*'
+    paths:
+    - '.github/**'
+    - 'build/**'
+    - '_tools/terraform/modules/**'
+
+jobs:
+
+  terraform-build:
+    name: 'Terrform Build'
+    runs-on: ubuntu-latest
+    env:
+      environment: qa
+    steps:
+      - name: Setup terraform provider
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.0.0
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+      - name: Checkout Source
+        uses: actions/checkout@v2
+
+      - name: build-qa-eu-west-1
+        shell: bash
+        run: |
+          make init
+          make validate
+          make version
+          make plan
+        working-directory: ./build/${{ env.environment }}/eu-west-1
