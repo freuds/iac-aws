@@ -158,7 +158,8 @@ update_workspace() {
         "name": "${WORKSPACE_NAME}",
         "terraform-version": "${TERRAFORM_VERSION}",
         "working-directory": "${WORKING_DIRECTORY}",
-        "description": "${WORKSPACE_DESCRIPTION}"
+        "description": "${WORKSPACE_DESCRIPTION}",
+        "global-remote-state": "true"
       }
     }
 }
@@ -223,9 +224,13 @@ do
   _ENV="${array[2]}"
   _REGION="${array[3]}"
 
+  _LABEL_SERVICE=$(echo ${_SERVICE} | tr '[:lower:]' '[:upper:]')
+  _LABEL_ENV=$(echo ${_ENV} | tr '[:lower:]' '[:upper:]')
+  _LABEL_REGION=$(echo ${_REGION} | tr '[:lower:]' '[:upper:]')
+
   WORKSPACE_NAME="${_SERVICE}-${_ENV}-${_REGION}"
   WORKING_DIRECTORY="${_SERVICE}/${_ENV}/${_REGION}"
-  WORKSPACE_DESCRIPTION="Workspace : ${_ENV^^} for ${_SERVICE^^} on ${_REGION^^}"
+  WORKSPACE_DESCRIPTION="Workspace : ${_LABEL_ENV} for ${_LABEL_SERVICE} on ${_LABEL_REGION}"
 
   # check if .terraform-config is existing and correct
   if ! grep "name = \"${WORKSPACE_NAME}\"" $CONFIG_TF 2>&1 >/dev/null ; then

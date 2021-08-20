@@ -88,8 +88,32 @@ variable "dynamodb_endpoint_enabled" {
   description = "Create or not the dynamoDB Endpoint inside the VPC"
 }
 
+variable "lambda_endpoint_enabled" {
+  default     = true
+  type        = bool
+  description = "Create or not the lambda Endpoint inside the VPC"
+}
+
 variable "cf_certificate_enabled" {
   default     = true
   type        = bool
   description = "Enable or not CloudFront SSL certificate"
+}
+
+variable "outbound_port" {
+  default = 0
+}
+
+variable "inbound_port" {
+  default = 0
+}
+
+variable "inbound_cidr_blocks" {
+  default = [
+  "0.0.0.0/0"]
+}
+
+variable "outbound_cidr_blocks" {
+  default = [
+  "0.0.0.0/0"]
 }

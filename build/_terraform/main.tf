@@ -5,4 +5,5 @@ module "build" {
   trusted_networks    = var.trusted_networks
   cidr_block          = var.cidr_block
   s3_endpoint_enabled = var.s3_endpoint_enabled
+  ssh_port            = var.ssh_port
 }

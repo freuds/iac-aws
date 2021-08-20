@@ -4,6 +4,10 @@ variable "env" {
   description = "Environment"
 }
 
+variable "organization" {
+  default = "fred-iac"
+}
+
 variable "service" {
   type        = string
   default     = "myapp"
