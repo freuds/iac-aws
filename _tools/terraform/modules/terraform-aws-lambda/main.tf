@@ -40,6 +40,10 @@ resource "aws_lambda_function" "this_lambda_name" {
     security_group_ids = var.security_group_ids
   }
 
+  tracing_config {
+    mode = "Active"
+  }
+
   depends_on = [
     aws_iam_role.lambda_exec
   ]
@@ -84,6 +88,11 @@ resource "aws_iam_role_policy_attachment" "lambda_policy_vpc" {
 resource "aws_iam_role_policy_attachment" "lambda_policy_xray" {
   role       = aws_iam_role.lambda_exec.name
   policy_arn = "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_policy_xray" {
+  role       = aws_iam_role.lambda_exec.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchLambdaInsightsExecutionRolePolicy"
 }
 
 // lambda permissions with SNS
