@@ -29,3 +29,8 @@ variable "s3_endpoint_enabled" {
   type    = bool
   default = false
 }
+
+variable "ssh_port" {
+  type    = number
+  default = 22
+}
