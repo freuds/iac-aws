@@ -39,7 +39,7 @@ output "vpc_endpoint_lambda_arn" {
 }
 
 output "sg_vpc_endpoint_lambda_id" {
-  value = aws_security_group.allow-lambda.id
+  value = aws_security_group.allow-lambda.*.id
 }
 
 # output "db_subnet_group" {

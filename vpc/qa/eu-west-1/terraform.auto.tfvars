@@ -19,12 +19,3 @@ gandi_alias_ns    = "qa.iac"
 
 bastion_enabled = false
 ssh_port        = 2345
-
-# subnet_priv_tags = {
-#   "kubernetes.io/cluster/qa-eks-cluster" = "shared"
-#   "kubernetes.io/role/internal-elb"      = "1"
-# }
-# subnet_pub_tags = {
-#   "kubernetes.io/cluster/qa-eks-cluster" = "shared"
-#   "kubernetes.io/role/elb"               = "1"
-# }
