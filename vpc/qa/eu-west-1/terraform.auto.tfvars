@@ -9,7 +9,9 @@ external_domain_name = "qa.iac.freuds.me"
 
 one_nat_gateway_per_az = false
 
-bastion_ami  = "ami-08ff4525d1ad50904"
+# AWS AMI  Linux 2 (64 bit x86) : ami-02b4e72b17337d6c1
+# AWS AMI  Linux 2 (64 bit Arm) : ami-04b149cd223547c24
+bastion_ami  = "ami-02b4e72b17337d6c1"
 root_keypair = "iac-aws-key"
 
 gandi_domain_name = "freuds.me"

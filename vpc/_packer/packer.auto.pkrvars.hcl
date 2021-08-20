@@ -5,9 +5,9 @@ inventory_groups = "bastion"
 playbook_file    = "../../_tools/ansible/playbooks/bastion.yml"
 
 # find values on the output of build service's
-security_group_id = "sg-03d5dc3021dc5a33e"
-subnet_id         = "subnet-0903fcf1b43dd444d"
-vpc_id            = "vpc-01243526962b57cd6"
+security_group_id = "sg-09856bd9e33b68d63"
+subnet_id         = "subnet-0b0bb84a0e4ee3d5f"
+vpc_id            = "vpc-015a9f3d3f5b52f4b"
 
 # Packer variables for apple M1
 # Doc: https://gist.github.com/nrjdalal/e70249bb5d2e9d844cc203fd11f74c55
