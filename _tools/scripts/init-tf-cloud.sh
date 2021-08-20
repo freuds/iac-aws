@@ -158,7 +158,8 @@ update_workspace() {
         "name": "${WORKSPACE_NAME}",
         "terraform-version": "${TERRAFORM_VERSION}",
         "working-directory": "${WORKING_DIRECTORY}",
-        "description": "${WORKSPACE_DESCRIPTION}"
+        "description": "${WORKSPACE_DESCRIPTION}",
+        "global-remote-state": "true"
       }
     }
 }
