@@ -38,6 +38,14 @@ output "public_name_servers" {
   value = module.vpc.public_name_servers
 }
 
+output "vpc_endpoint_lambda_arn" {
+  value = module.vpc.vpc_endpoint_lambda_arn
+}
+
+output "sg_vpc_endpoint_lambda_id" {
+  value = module.vpc.sg_vpc_endpoint_lambda_id
+}
+
 # output "vpc_dns_srv_ip" {
 #   value = module.vpc.vpc_dns_srv_ip
 # }

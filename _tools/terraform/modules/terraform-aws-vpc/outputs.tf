@@ -34,6 +34,14 @@ output "private_subnets_cidr" {
   value = [for b in aws_subnet.private : b.cidr_block]
 }
 
+output "vpc_endpoint_lambda_arn" {
+  value = aws_vpc_endpoint.lambda.*.arn
+}
+
+output "sg_vpc_endpoint_lambda_id" {
+  value = aws_security_group.allow-lambda.id
+}
+
 # output "db_subnet_group" {
 #   value = aws_db_subnet_group.db-subnet-group.name
 # }
