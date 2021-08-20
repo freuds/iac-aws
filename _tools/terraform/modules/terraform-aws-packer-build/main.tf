@@ -76,9 +76,9 @@ resource "aws_security_group" "packer" {
   description = "SG used by EC2 instances being packerized (aws-ebs builder only)"
   vpc_id      = aws_vpc.build.id
   ingress {
-    from_port   = 22
+    from_port   = var.ssh_port
     protocol    = "TCP"
-    to_port     = 22
+    to_port     = var.ssh_port
     cidr_blocks = var.trusted_networks
   }
   egress {
