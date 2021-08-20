@@ -34,6 +34,10 @@ output "public_domain" {
   value = module.vpc.public_domain_name
 }
 
+output "public_host_zone_id" {
+  value = module.vpc.public_host_zone_id
+}
+
 output "public_name_servers" {
   value = module.vpc.public_name_servers
 }
@@ -58,9 +62,9 @@ output "sg_vpc_endpoint_lambda_id" {
 #   value = module.bastion.ssh_from_bastion
 # }
 
-# output "ssl_cert_arn" {
-#   value = module.vpc.ssl_cert_arn
-# }
+output "ssl_cert_arn" {
+  value = module.vpc.ssl_cert_arn
+}
 
 # output "ssl_prod_arn" {
 #   value = module.vpc.prod_ssl_cert_arn

@@ -58,42 +58,41 @@ resource "aws_cloudwatch_log_group" "this_lambda_name" {
 // IAM role for lambda
 //---------------------------//
 resource "aws_iam_role" "lambda_exec" {
-  name = format("role-lambda-%s-%s", var.env, var.lambda_name)
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Sid    = ""
-        Principal = {
-          Service = "lambda.amazonaws.com"
-        }
-      },
-    ]
-  })
+  name               = format("role-lambda-%s-%s", var.env, var.lambda_name)
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume.json
 }
 
-resource "aws_iam_role_policy_attachment" "lambda_policy_exec" {
+data "aws_iam_policy_document" "lambda_assume" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_exec_basic" {
   role       = aws_iam_role.lambda_exec.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-resource "aws_iam_role_policy_attachment" "lambda_policy_vpc" {
+resource "aws_iam_role_policy_attachment" "lambda_exec_vpc" {
   role       = aws_iam_role.lambda_exec.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
 
-resource "aws_iam_role_policy_attachment" "lambda_policy_xray" {
+resource "aws_iam_role_policy_attachment" "lambda_exec_xray" {
   role       = aws_iam_role.lambda_exec.name
   policy_arn = "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
 }
 
-resource "aws_iam_role_policy_attachment" "lambda_policy_xray" {
-  role       = aws_iam_role.lambda_exec.name
-  policy_arn = "arn:aws:iam::aws:policy/CloudWatchLambdaInsightsExecutionRolePolicy"
-}
+// resource "aws_iam_role_policy_attachment" "lambda_exec_insight" {
+//   role       = aws_iam_role.lambda_exec.name
+//   policy_arn = "arn:aws:iam::aws:policy/CloudWatchLambdaInsightsExecutionRolePolicy"
+// }
 
 // lambda permissions with SNS
 // resource "aws_lambda_permission" "with_sns" {
