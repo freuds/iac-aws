@@ -34,6 +34,15 @@ resource "aws_lambda_function" "this_lambda_name" {
   source_code_hash = data.archive_file.this_lambda.output_base64sha256
 
   role = aws_iam_role.lambda_exec.arn
+
+  vpc_config {
+    subnet_ids         = var.subnet_ids
+    security_group_ids = var.security_group_ids
+  }
+
+  depends_on = [
+    aws_iam_role.lambda_exec
+  ]
 }
 
 resource "aws_cloudwatch_log_group" "this_lambda_name" {
@@ -41,24 +50,66 @@ resource "aws_cloudwatch_log_group" "this_lambda_name" {
   retention_in_days = 30
 }
 
+//---------------------------//
+// IAM role for lambda
+//---------------------------//
 resource "aws_iam_role" "lambda_exec" {
   name = format("role-lambda-%s-%s", var.env, var.lambda_name)
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [{
-      Action = "sts:AssumeRole"
-      Effect = "Allow"
-      Sid    = ""
-      Principal = {
-        Service = "lambda.amazonaws.com"
-      }
-      }
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = ""
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      },
     ]
   })
 }
 
-resource "aws_iam_role_policy_attachment" "lambda_policy" {
+resource "aws_iam_role_policy_attachment" "lambda_policy_exec" {
   role       = aws_iam_role.lambda_exec.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
+
+resource "aws_iam_role_policy_attachment" "lambda_policy_vpc" {
+  role       = aws_iam_role.lambda_exec.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_policy_xray" {
+  role       = aws_iam_role.lambda_exec.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
+}
+
+// lambda permissions with SNS
+// resource "aws_lambda_permission" "with_sns" {
+//   statement_id  = "AllowExecutionFromSNS"
+//   action        = "lambda:InvokeFunction"
+//   function_name = aws_lambda_function.func.function_name
+//   principal     = "sns.amazonaws.com"
+//   source_arn    = aws_sns_topic.default.arn
+// }
+
+// resource "aws_sns_topic" "default" {
+//   name = "call-lambda-maybe"
+// }
+
+// resource "aws_sns_topic_subscription" "lambda" {
+//   topic_arn = aws_sns_topic.default.arn
+//   protocol  = "lambda"
+//   endpoint  = aws_lambda_function.func.arn
+// }
+
+// resource "aws_lambda_layer_version" "example" {
+//   # ... other configuration ...
+// }
+
+// resource "aws_lambda_function" "example" {
+//   # ... other configuration ...
+//   layers = [aws_lambda_layer_version.example.arn]
+// }

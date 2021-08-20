@@ -6,6 +6,8 @@ module "lambda" {
   lambda_name    = var.lambda_name
   lambda_handler = var.lambda_handler
   lambda_runtime = var.lambda_runtime
+  subnet_ids     = data.terraform_remote_state.vpc.outputs.private_subnets
+  security_group_ids = data.terraform_remote_state.vpc.outputs.sg_vpc_endpoint_lambda_id
 }
 
 data "aws_lambda_function" "helloword" {
@@ -23,5 +25,6 @@ module "apigateway" {
   region          = var.region
   integration_uri = data.aws_lambda_function.helloword.invoke_arn
   function_name   = data.aws_lambda_function.helloword.function_name
-
+  subnet_ids     = data.terraform_remote_state.vpc.outputs.private_subnets
+  security_group_ids = data.terraform_remote_state.vpc.outputs.sg_vpc_endpoint_lambda_id
 }

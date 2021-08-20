@@ -26,3 +26,15 @@ variable "function_name" {
   type        = string
   description = "Function name for Api Gateway"
 }
+
+variable "subnet_ids" {
+  default     = []
+  type        = list
+  description = "List of subnet IDs"
+}
+
+variable "security_group_ids" {
+  default     = []
+  type        = list
+  description = "List of subnet IDs"
+}

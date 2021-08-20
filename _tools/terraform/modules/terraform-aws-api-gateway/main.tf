@@ -59,3 +59,15 @@ resource "aws_lambda_permission" "api_gw" {
 
   source_arn = "${aws_apigatewayv2_api.lambda.execution_arn}/*/*"
 }
+
+resource "aws_apigatewayv2_vpc_link" "api_gw" {
+  name               = format("vpc-link-%s", var.env)
+  security_group_ids = var.security_group_ids
+  subnet_ids         = var.subnet_ids
+
+  tags = {
+    Environment = var.env,
+    Stack       = "common",
+    Role        = "vpc_link"
+  }
+}

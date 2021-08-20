@@ -25,3 +25,15 @@ variable "lambda_handler" {
   type        = string
   description = "handler for Lambda function : .handler as suffix"
 }
+
+variable "subnet_ids" {
+  default     = []
+  type        = list
+  description = "List of subnet IDs"
+}
+
+variable "security_group_ids" {
+  default     = []
+  type        = list
+  description = "List of subnet IDs"
+}
