@@ -240,15 +240,15 @@ resource "aws_vpc_endpoint" "dynamodb" {
 }
 
 resource "aws_vpc_endpoint" "lambda" {
-  count        = var.lambda_endpoint_enabled ? 1 : 0
-  vpc_id       = aws_vpc.main.id
-  service_name = "com.amazonaws.${var.region}.lambda"
-  vpc_endpoint_type = "Interface"
+  count               = var.lambda_endpoint_enabled ? 1 : 0
+  vpc_id              = aws_vpc.main.id
+  service_name        = "com.amazonaws.${var.region}.lambda"
+  vpc_endpoint_type   = "Interface"
   private_dns_enabled = true
   security_group_ids = [
     aws_security_group.allow-lambda.id,
   ]
-  subnet_ids      = [for o in aws_subnet.private : o.id]
+  subnet_ids = [for o in aws_subnet.private : o.id]
 
   tags = {
     Environment = var.env,
