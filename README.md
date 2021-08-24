@@ -36,13 +36,13 @@ Username : admin
 ```
 _tools
 ├── ansible
-│   ├── playbooks
-│   │   ├── group_vars
-│   │   └── inventory
-│   └── roles
+│   ├── playbooks
+│   │   ├── group_vars
+│   │   └── inventory
+│   └── roles
 ├── packer
-│   ├── scripts
-│   └── templates
+│   ├── scripts
+│   └── templates
 ├── scripts
 └── terraform
     └── modules
@@ -82,7 +82,7 @@ For some services, inside __packer__ folder, you can build AMIs from different I
 # With argument, we build a AMI on AWS
 ./packer.sh <-debug>
 
-# With argument -local 
+# With argument -local
 ./pacher.sh -local <qemu> -debug
 ```
 Provisioning is done with Ansible.
@@ -98,13 +98,15 @@ after that, you can launch a plan
 ```
 make plan
 make apply
-# or make apply-force 
+# or make apply-force
 ```
 
 ## TODO
 
 - [X] : Implement module gandi-dns : up to date AWS NS inside Gandi Zone
-- [ ] : Secure (SSH) instances : modify SG, ssh_port, and packer build 
+- [ ] : Secure (SSH) instances : modify SG, ssh_port, and packer build
 - [X] : bastion module : rewrite role_policy
 - [X] : bastion module : fix ipaddress re-assign
 - [ ] : bastion module : add KMS encryption
+- [X] : terraform lambda + apigateway inside VPC
+- [ ] : lambda layer nodejs

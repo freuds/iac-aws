@@ -13,7 +13,12 @@ output "lambda_invoke_arn" {
   value       = module.lambda.lambda_invoke_arn
 }
 
-output "apigateway_base_uri" {
+output "agw_base_uri" {
   description = "Base URL for API Gateway stage."
-  value = module.apigateway.base_url
+  value       = module.apigateway.base_url
+}
+
+output "agw_domain_arn" {
+  description = "The ARN of the domain name"
+  value = module.apigateway.domain_name_arn
 }

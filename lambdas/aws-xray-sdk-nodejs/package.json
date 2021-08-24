@@ -1,0 +1,17 @@
+{
+    "name": "aws-xray-sdk-layer",
+    "version": "1.0.1",
+    "private": true,
+    "devDependencies": {
+        "aws-sdk": "2.974.0",
+        "jest": "^25.4.0"
+    },
+    "dependencies": {
+        "aws-xray-sdk-core": "3.3.3",
+        "axios": "^0.21.1",
+        "pretty-ms": "^7.0.1"
+    },
+    "scripts": {
+        "test": "jest"
+    }
+}
