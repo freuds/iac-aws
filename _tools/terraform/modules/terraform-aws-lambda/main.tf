@@ -3,8 +3,9 @@ resource "aws_s3_bucket" "lambda_bucket" {
   acl           = "private"
   force_destroy = var.force_destroy
 }
-
+//------------------------
 // content lambda into s3
+//------------------------
 data "archive_file" "this_lambda" {
   type = "zip"
 
@@ -21,9 +22,11 @@ resource "aws_s3_bucket_object" "this_lambda" {
   etag = filemd5(data.archive_file.this_lambda.output_path)
 }
 
+//------------------------
 // build lambda function
+//------------------------
 resource "aws_lambda_function" "this_lambda_name" {
-  function_name = format("%s-%s", var.env, var.lambda_name)
+  function_name = var.lambda_name
 
   s3_bucket = aws_s3_bucket.lambda_bucket.id
   s3_key    = aws_s3_bucket_object.this_lambda.key
@@ -43,6 +46,8 @@ resource "aws_lambda_function" "this_lambda_name" {
   tracing_config {
     mode = "Active"
   }
+
+  layers = var.xray_enable ? aws_lambda_layer_version.xray-sdk-layer[*].arn : []
 
   depends_on = [
     aws_iam_role.lambda_exec
@@ -73,7 +78,9 @@ data "aws_iam_policy_document" "lambda_assume" {
     }
   }
 }
-
+//------------------------
+// Attached Policy
+//------------------------
 resource "aws_iam_role_policy_attachment" "lambda_exec_basic" {
   role       = aws_iam_role.lambda_exec.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -85,9 +92,46 @@ resource "aws_iam_role_policy_attachment" "lambda_exec_vpc" {
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_exec_xray" {
+  count      = var.xray_enable ? 1 : 0
   role       = aws_iam_role.lambda_exec.name
   policy_arn = "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
 }
+
+//------------------------
+// AWS X-Ray SDK layer
+//------------------------
+locals {
+  sdk_layer_name = format("aws-xray-sdk-%s", var.layer_type_lib)
+}
+
+data "archive_file" "xray-sdk-layer" {
+  count      = var.xray_enable ? 1 : 0
+  type = "zip"
+  source_dir  = "../../../lambdas/${local.sdk_layer_name}"
+  output_path = "../../../lambdas/${local.sdk_layer_name}.zip"
+}
+
+resource "aws_s3_bucket_object" "xray-sdk-layer" {
+  count      = var.xray_enable ? 1 : 0
+  bucket = aws_s3_bucket.lambda_bucket.id
+  key    = "${local.sdk_layer_name}.zip"
+  source = data.archive_file.xray-sdk-layer[0].output_path
+  etag = filemd5(data.archive_file.xray-sdk-layer[0].output_path)
+}
+
+resource "aws_lambda_layer_version" "xray-sdk-layer" {
+  count      = var.xray_enable ? 1 : 0
+  filename   = "../../../lambdas/${local.sdk_layer_name}.zip"
+  layer_name = format("%s-layer", local.sdk_layer_name)
+  compatible_runtimes = toset(lookup(var.compatible_runtimes, var.layer_type_lib))
+  description = var.layer_description
+  license_info = var.license_info
+  source_code_hash = data.archive_file.xray-sdk-layer[0].output_base64sha256
+}
+
+
+
+
 
 // resource "aws_iam_role_policy_attachment" "lambda_exec_insight" {
 //   role       = aws_iam_role.lambda_exec.name
