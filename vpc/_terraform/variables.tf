@@ -48,7 +48,7 @@ variable "bastion_ami" {
 }
 
 variable "bastion_instance_type" {
-  default     = "t2.micro"
+  default     = "t3.micro"
   type        = string
   description = "EC2 instance type default"
 }
@@ -89,6 +89,8 @@ variable "ssh_port" {
 
 variable "GANDI_API_KEY" {
   description = "Gandi API Key defined in Terraform Cloud environment"
+  default = ""
+  type = string
 }
 
 variable "gandi_domain_name" {

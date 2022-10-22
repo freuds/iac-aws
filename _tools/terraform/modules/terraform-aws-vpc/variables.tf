@@ -45,7 +45,8 @@ variable "azs" {
     eu-west-1 = [
       "eu-west-1a",
       "eu-west-1b",
-    "eu-west-1c"]
+    # "eu-west-1c"
+    ]
     us-east-1 = [
       "us-east-1a",
       "us-east-1b",
