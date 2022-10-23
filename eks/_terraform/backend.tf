@@ -4,7 +4,7 @@ terraform {
     organization = "fred-iac"
 
     workspaces {
-      prefix = "vpc-"
+      prefix = "eks-"
     }
   }
 }

@@ -103,10 +103,14 @@ make apply
 
 ## TODO
 
-- [X] : Implement module gandi-dns : up to date AWS NS inside Gandi Zone
-- [ ] : Secure (SSH) instances : modify SG, ssh_port, and packer build
-- [X] : bastion module : rewrite role_policy
-- [X] : bastion module : fix ipaddress re-assign
-- [ ] : bastion module : add KMS encryption
+- [X] Implement module gandi-dns : up to date AWS NS inside Gandi Zone
+- [ ] Secure (SSH) instances : modify SG, ssh_port, and packer build
+- [ ] Implement boundary
+- [X] : bastion
+    - [X] rewrite role_policy
+    - [X] : bastion module : fix ipaddress re-assign
+    - [ ] : bastion module : add KMS encryption
 - [X] : terraform lambda + apigateway inside VPC
-- [ ] : lambda layer nodejs
+    - [ ] : lambda layer nodejs
+- [ ] : eks
+    - [ ] : terraform module for nodes group

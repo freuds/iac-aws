@@ -1,0 +1,3 @@
+workspaces {
+    name = "eks-qa-eu-west-1"
+}

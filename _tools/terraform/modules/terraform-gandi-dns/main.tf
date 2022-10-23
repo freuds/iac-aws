@@ -8,7 +8,7 @@ terraform {
 }
 
 provider "gandi" {
-  key = var.gandi_api_key
+  key = var.GANDI_APIKEY
 }
 
 data "gandi_domain" "origin" {
@@ -16,7 +16,7 @@ data "gandi_domain" "origin" {
 }
 
 resource "gandi_livedns_record" "aws-ns" {
-  zone   = data.gandi_domain.origin.id
+  zone   = data.gandi_domain.origin[0].id
   name   = var.gandi_alias_ns
   type   = "NS"
   ttl    = var.ns_ttl

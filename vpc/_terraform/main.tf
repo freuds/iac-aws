@@ -1,5 +1,5 @@
 module "vpc" {
-  source                 = "git@github.com:xxxxxxxxxxxxxx/terraform-aws-vpc.git"
+  source                 = "../../../_tools/terraform/modules/terraform-aws-vpc"
   env                    = var.env
   region                 = var.region
   cidr_block             = var.cidr_block
@@ -14,13 +14,13 @@ module "vpc" {
   cf_certificate_enabled = var.cf_certificate_enabled
 }
 
-# module "gandi-dns" {
-#   source            = "git@github.com:xxxxxxxxxxxxxx/terraform-gandi-dns.git"
-#   gandi_api_key     = var.GANDI_API_KEY
-#   gandi_domain_name = var.gandi_domain_name
-#   gandi_alias_ns    = var.gandi_alias_ns
-#   gandi_aws_ns      = [for ns in module.vpc.public_name_servers : format("%s.", ns)]
-# }
+module "gandi-dns" {
+  source            = "../../../_tools/terraform/modules/terraform-gandi-dns"
+  gandi_apikey     = var.GANDI_APIKEY
+  gandi_domain_name = var.gandi_domain_name
+  gandi_alias_ns    = var.gandi_alias_ns
+  gandi_aws_ns      = [for ns in module.vpc.public_name_servers : format("%s.", ns)]
+}
 
 # module "bastion" {
 #   source                     = "git@github.com:xxxxxxxxxxxxxx/terraform-aws-bastion.git"

@@ -1,7 +1,5 @@
-variable "gandi_api_key" {
-  default     = ""
-  type        = string
-  description = "Gandi API Key"
+variable "GANDI_APIKEY" {
+  description = "Gandi API Key defined in Terraform Cloud environment."
 }
 
 variable "ns_ttl" {

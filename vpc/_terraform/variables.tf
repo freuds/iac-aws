@@ -87,10 +87,8 @@ variable "ssh_port" {
   default = 22
 }
 
-variable "GANDI_API_KEY" {
-  description = "Gandi API Key defined in Terraform Cloud environment"
-  default = ""
-  type = string
+variable "GANDI_APIKEY" {
+  description = "Gandi API Key defined in Terraform Cloud environment."
 }
 
 variable "gandi_domain_name" {
