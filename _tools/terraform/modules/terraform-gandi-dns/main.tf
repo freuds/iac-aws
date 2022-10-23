@@ -8,7 +8,7 @@ terraform {
 }
 
 provider "gandi" {
-  key = var.GANDI_APIKEY
+  key = var.gandi_apikey
 }
 
 data "gandi_domain" "origin" {

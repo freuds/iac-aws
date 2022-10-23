@@ -1,4 +1,4 @@
-variable "GANDI_APIKEY" {
+variable "gandi_apikey" {
   description = "Gandi API Key defined in Terraform Cloud environment."
 }
 
