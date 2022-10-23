@@ -16,7 +16,7 @@ module "vpc" {
 
 module "gandi-dns" {
   source            = "../../../_tools/terraform/modules/terraform-gandi-dns"
-  gandi_apikey     = var.TF_VAR_GANDI_APIKEY
+  gandi_apikey     = var.GANDI_APIKEY
   gandi_domain_name = var.gandi_domain_name
   gandi_alias_ns    = var.gandi_alias_ns
   gandi_aws_ns      = [for ns in module.vpc.public_name_servers : format("%s.", ns)]
