@@ -5,7 +5,7 @@ haproxy_daemon_enabled: no
 haproxy_nb_proc: '__HAPROXY_NB_PROC__'
 haproxy_cpu_map: '__HAPROXY_CPU_MAP__'
 haproxy_logs_enabled: true
-haproxy_unique_id_header: X-PHENIX-TRACE-ID
+haproxy_unique_id_header: X-ORG-TRACE-ID
 haproxy_global_vars:
   - 'ca-base /etc/ssl/certs'
   - 'crt-base /etc/ssl/private'
@@ -22,8 +22,8 @@ haproxy_resolvers:
     resolve_retry_timeout: '1s'
     resolve_hold_valid: '10s'
 haproxy_userlists:
-  - name: 'phenix_users'
-    user: 'phenix'
+  - name: 'my_users'
+    user: 'user'
     password: 'b4o/FoDV'
 haproxy_frontends:
   - name: 'http'
@@ -37,19 +37,19 @@ haproxy_frontends:
       - name: 'acl-forwarded-http'
         rule: 'hdr_reg(x-forwarded-proto) -i ^http$'
       - name: 'acl-origin'
-        rule: 'hdr_reg(host) -i ^[^\.]*\-origin[\.a-z]*\.wearephenix.com\.[\.a-z]*$'
+        rule: 'hdr_reg(host) -i ^[^\.]*\-origin[\.a-z]*\.example.com\.[\.a-z]*$'
       - name: 'acl-apex-com'
-        rule: 'hdr_reg(host) -i ^[^\.]*\.wearephenix\.com$'
+        rule: 'hdr_reg(host) -i ^[^\.]*\.example\.com$'
       - name: 'acl-admin'
-        rule: 'hdr_reg(host) -i ^admin[^\.]*[\.a-z]*\.wearephenix\.com$'
+        rule: 'hdr_reg(host) -i ^admin[^\.]*[\.a-z]*\.example\.com$'
       - name: 'acl-api'
-        rule: 'hdr_reg(host) -i ^api[^\.]*[\.a-z]*\.wearephenix\.com$'
+        rule: 'hdr_reg(host) -i ^api[^\.]*[\.a-z]*\.example\.com$'
       - name: 'acl-webapp'
-        rule: 'hdr_reg(host) -i ^webapp[^\.]*[\.a-z]*\.wearephenix\.com$'
+        rule: 'hdr_reg(host) -i ^webapp[^\.]*[\.a-z]*\.example\.com$'
       - name: 'acl-app'
-        rule: 'hdr_reg(host) -i ^app[^\.]*[\.a-z]*\.wearephenix\.com$'
+        rule: 'hdr_reg(host) -i ^app[^\.]*[\.a-z]*\.example\.com$'
     http_basic_auth:
-      - user_list: 'phenix_users'
+      - user_list: 'my_users'
         realm: 'Phenix HTTP Auth'
     default_backend: 'eks-ingress'
     captures:
@@ -81,7 +81,7 @@ haproxy_backends:
   - name: 'eks-ingress'
     mode: 'http'
     add_headers:
-      - header: 'x-phenix-trace-id'
+      - header: 'x-org-trace-id'
         value: '%ID'
     servers:
       - name: 'eks-internal-lb'

@@ -1,0 +1,44 @@
+version: "3"
+
+vars:
+
+tasks:
+  vagrant:install:
+    desc: "Install Vagrant"
+    cmds:
+      - curl -fsSL XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX | sudo apt-key add -
+      - sudo apt-add-repository "deb [arch=amd64] XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX $(lsb_release -cs) main"
+      - sudo apt-get update && sudo apt-get install vagrant
+    silent: true
+    status:
+      - test -x "$(command -v vagrant)"
+
+  vagrant:up:
+    desc: "Start Vagrant"
+    cmds:
+      - vagrant up
+    silent: true
+
+  vagrant:ssh:
+    desc: "SSH into Vagrant"
+    cmds:
+      - vagrant ssh
+    silent: true
+
+  vagrant:halt:
+    desc: "Halt Vagrant"
+    cmds:
+      - vagrant halt
+    silent: true
+
+  vagrant:destroy:
+    desc: "Destroy Vagrant"
+    cmds:
+      - vagrant destroy
+    silent: true
+
+  vagrant:status:
+    desc: "Show Vagrant status"
+    cmds:
+      - vagrant status
+    silent: true

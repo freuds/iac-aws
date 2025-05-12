@@ -8,12 +8,12 @@ data "aws_region" "current" {}
 
 locals {
   k8s_resources_labels = merge({
-    "born2scale.io/terraform-module" = "eks-external-dns",
+    "example.io/terraform-module" = "eks-external-dns",
   }, var.k8s_resources_labels)
 }
 
 resource "kubernetes_namespace" "external_dns" {
-  count = var.k8s_namespace_create  && var.enabled ? 1 : 0
+  count = var.k8s_namespace_create && var.enabled ? 1 : 0
   metadata {
     name = var.k8s_namespace
   }
@@ -22,9 +22,9 @@ resource "kubernetes_namespace" "external_dns" {
 resource "kubernetes_service_account" "external_dns" {
   count = var.enabled ? 1 : 0
   metadata {
-    name        = "${var.k8s_resources_name_prefix}external-dns"
-    namespace   = var.k8s_namespace
-    labels      = local.k8s_resources_labels
+    name      = "${var.k8s_resources_name_prefix}external-dns"
+    namespace = var.k8s_namespace
+    labels    = local.k8s_resources_labels
     annotations = {
       "eks.amazonaws.com/role-arn" = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${aws_iam_role.external_dns.0.name}"
     }
@@ -44,12 +44,12 @@ resource "aws_iam_role" "external_dns" {
 data "aws_iam_policy_document" "eks_oidc_assume_role" {
   statement {
     actions = [
-      "sts:AssumeRoleWithWebIdentity"]
-    effect  = "Allow"
+    "sts:AssumeRoleWithWebIdentity"]
+    effect = "Allow"
     condition {
       test     = "StringEquals"
       variable = "${replace(data.aws_eks_cluster.current.identity[0].oidc[0].issuer, "https://", "")}:sub"
-      values   = [
+      values = [
         "system:serviceaccount:${var.k8s_namespace}:${var.k8s_resources_name_prefix}external-dns"
       ]
     }
@@ -57,7 +57,7 @@ data "aws_iam_policy_document" "eks_oidc_assume_role" {
       identifiers = [
         "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${replace(data.aws_eks_cluster.current.identity[0].oidc[0].issuer, "https://", "")}"
       ]
-      type        = "Federated"
+      type = "Federated"
     }
   }
 }

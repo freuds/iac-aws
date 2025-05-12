@@ -14,9 +14,10 @@ variable "s3_origins_paths" {
 }
 
 variable "organization" {
-  default = "phenix"
+  description = "Name of the organization"
+  type        = string
+  default     = ""
 }
-
 variable "api_http_port" {
   type    = number
   default = 80
@@ -53,7 +54,7 @@ variable "api_read_timeout" {
 }
 
 variable "api_aliases_cloudfront" {
-  default = ["api.qa.wearephenix.com"]
+  default = ["api.qa.example.com"]
 }
 
 variable "api_records" {
@@ -127,11 +128,11 @@ variable "assets_cached_methods" {
 }
 
 variable "assets_comment_OAI" {
-  default = "origin access identity for phenix-QA"
+  default = "origin access identity for QA"
 }
 
 variable "assets_aliases_cloudfront" {
-  default = ["s.qa.wearephenix.com"]
+  default = ["s.qa.example.com"]
 }
 
 variable "asset_record" {

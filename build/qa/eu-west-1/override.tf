@@ -1,3 +1,3 @@
-module "build" {
-  source = "../../../_tools/terraform/modules/terraform-aws-packer-build"
-}
+# module "build" {
+#   source = "../../../_tools/terraform/modules/terraform-aws-packer-build"
+# }

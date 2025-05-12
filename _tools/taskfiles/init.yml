@@ -1,0 +1,97 @@
+version: "3"
+
+vars:
+  TF_VERSION:
+    sh: 'cat {{.ROOT_DIR}}/.terraform-version'
+
+tasks:
+  init:tf:check:
+    desc: "Display and Fix terraform-version files for the project"
+    silent: true
+    dir: '../scripts'
+    cmds:
+      - ./terraform-version.sh {{.ROOT_DIR}}
+
+  init:tf:install:
+    desc: "Install specific version of terraform with TFenv"
+    silent: true
+    cmds:
+      - 'tfenv install {{.TF_VERSION}}'
+
+  init:tf:use:
+    desc: "Use specific version of terraform with TFenv"
+    silent: true
+    cmds:
+      - 'tfenv use {{.TF_VERSION}}'
+
+  init:links:
+    desc: "Generate all needed symlinks for a service"
+    silent: true
+    internal: true
+    cmds:
+      - |
+        CURRENT_DIR={{.USER_WORKING_DIR}}
+        RELATIVE_DIR="../../_terraform"
+        SERVICE_DIR=${CURRENT_DIR}/${RELATIVE_DIR}
+
+        if [ ! -d "${SERVICE_DIR}" ]; then
+          echo "Missing terraform directory for this service"
+          exit 2
+        fi
+        # cleanup existing links
+        find {{.USER_WORKING_DIR}} -type l -delete
+
+        # Create links to the terraform modules
+        for f in $(find ${SERVICE_DIR} -type f -name '*.tf'); do
+          if [ -f "$f" ]; then
+            filename=$(basename "$f")
+            cd {{.USER_WORKING_DIR}}
+            ln -s "${RELATIVE_DIR}/${filename}" "${filename}"
+          fi
+        done
+
+  init:tfc:
+    desc: "Configuration for Terraform Cloud environment"
+    deps: ['install:uv']
+    silent: true
+    cmds:
+      - |
+        source ~/.venv/bin/activate
+        uv run '{{.SCRIPTS_DIR}}/tfc-manage.py'
+
+  install:ansible:
+    desc: "Install Ansible"
+    deps: ['install:uv']
+    silent: true
+    cmds:
+      - |
+        export PIP_DISABLE_PIP_VERSION_CHECK=1
+        export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+        export CRYPTOGRAPHY_DONT_BUILD_RUST=1
+        cd {{.ROOT_DIR}}
+        if [ ! -d ~/.venv ]; then
+          cd $HOME ; uv venv
+        fi
+        source ~/.venv/bin/activate
+        uv pip install ansible-core docker
+
+  install:ansible:galaxy:
+    desc: "Install Ansible Galaxy Roles"
+    silent: true
+    deps: ['install:uv', 'install:ansible']
+    dir: '{{.ROOT_DIR}}'
+    cmds:
+      - |
+        source ~/.venv/bin/activate
+        ansible-galaxy install -f -r ./_tools/ansible/galaxy/requirements.yml -p ./_tools/ansible/galaxy/roles
+
+  install:uv:
+    desc: "Install UV Astral"
+    silent: true
+    internal: true
+    cmds:
+      - |
+        if ! command -v "uv" > /dev/null; then
+          echo "It looks like 'uv' is not installed; we install it:"
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+        fi

@@ -39,37 +39,37 @@ variable "security_group_ids" {
 }
 
 variable "xray_enable" {
-  default = false
-  type = bool
+  default     = false
+  type        = bool
   description = "Enable or not the AWS X-Ray service for lambda"
 }
 
 variable "layer_type_lib" {
-  default = "nodejs"
-  type = string
+  default     = "nodejs"
+  type        = string
   description = "Define the library used for the layer SDK"
 }
 
 variable "layer_description" {
   default = "Layer for X-Ray SDK"
-  type = string
+  type    = string
 }
 
 variable "license_info" {
   default = "MIT License"
-  type = string
+  type    = string
 }
 
 variable "compatible_runtimes" {
   default = {
     nodejs = [
       "nodejs12.x",
-      "nodejs14.x"]
+    "nodejs14.x"]
     python = [
       "python3.6",
       "python3.7",
-      "python3.8"]
+    "python3.8"]
   }
-  type = map(list(string))
+  type        = map(list(string))
   description = "Define the compatible library SDK"
 }

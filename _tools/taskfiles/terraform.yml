@@ -1,0 +1,101 @@
+version: "3"
+
+tasks:
+
+  tf:init:
+    deps: [init:links]
+    desc: "Initialize terraform configuration"
+    dir: '{{.USER_WORKING_DIR}}'
+    silent: true
+    cmds:
+      - terraform init -reconfigure -backend-config=config.remote.tfbackend
+
+  tf:fmt:
+    desc: "Apply terraform fmt recursively all .tf file"
+    dir: '{{.ROOT_DIR}}'
+    silent: false
+    cmds:
+      - terraform fmt -recursive
+
+  tf:clean:
+    desc: "Clean terraform cache"
+    silent: true
+    dir: '{{.USER_WORKING_DIR}}'
+    cmds:
+      - rm -rf .terraform
+
+  tf:validate:
+    desc: "Validate terraform configuration"
+    dir: '{{.USER_WORKING_DIR}}'
+    silent: true
+    cmds:
+      - terraform validate
+
+  tf:list:
+    desc: "List terraform configuration"
+    dir: '{{.USER_WORKING_DIR}}'
+    cmds:
+      - terraform providers
+      - terraform state list
+
+  tf:plan:
+    desc: "Plan terraform configuration"
+    dir: '{{.USER_WORKING_DIR}}'
+    silent: true
+    cmds:
+      - terraform plan #-out=tfplan
+
+  tf:apply:
+    desc: "Apply terraform configuration"
+    dir: '{{.USER_WORKING_DIR}}'
+    silent: true
+    cmds:
+      - terraform apply tfplan
+
+  tf:version:
+    desc: "Display terraform version"
+    cmds:
+      - terraform version
+
+  tf:graph:
+    desc: "Display terraform graph"
+    dir: '{{.USER_WORKING_DIR}}'
+    cmds:
+      - terraform graph | dot -Tsvg > graph.svg
+      - open graph.svg
+      - echo "Graph generated in graph.svg"
+
+  tf:state:show:
+    desc: "Show terraform state"
+    dir: '{{.USER_WORKING_DIR}}'
+    cmds:
+      - terraform show
+
+  tf:state:pull:
+    desc: "Pull terraform state"
+    dir: '{{.USER_WORKING_DIR}}'
+    cmds:
+      - terraform state pull > state.tfstate
+
+  tf:state:push:
+    desc: "Push terraform state"
+    dir: '{{.USER_WORKING_DIR}}'
+    cmds:
+      - terraform state push state.tfstate
+
+  # tf:destroy:
+  #   desc: "Destroy terraform configuration"
+  #   cmds:
+  #     - terraform destroy -auto-approve
+
+  tf:output:
+    desc: "Show terraform output"
+    dir: '{{.USER_WORKING_DIR}}'
+    cmds:
+      - terraform output
+
+  tf:doc:
+    desc: "Generate terraform documentation"
+    dir: '{{.USER_WORKING_DIR}}'
+    cmds:
+      - 'terraform-docs markdown table --anchor=false ./ --output-file=README.md --output-mode=inject'

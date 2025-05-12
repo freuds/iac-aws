@@ -44,3 +44,10 @@ variable "ssh_port" {
   type    = number
   default = 22
 }
+
+variable "tags" {
+  type = map(string)
+  default = {
+    "Stack" = "packer"
+  }
+}

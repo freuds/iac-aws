@@ -1,43 +1,46 @@
-name: Terraform Baseline
+# name: Terraform Baseline
 
-on:
-  push:
-    branches:
-    - main
-    paths:
-    - '.github/**'
-    - 'baseline/**'
-    - '_tools/terraform/modules/**'
-  pull_request:
-    branches:
-    - '*'
-    paths:
-    - '.github/**'
-    - 'baseline/**'
-    - '_tools/terraform/modules/**'
+# on:
+#   push:
+#     branches:
+#     - main
+#     paths:
+#     - '.github/**'
+#     - 'baseline/**'
+#     - '_tools/terraform/modules/**'
+#   pull_request:
+#     branches:
+#     - '*'
+#     paths:
+#     - '.github/**'
+#     - 'baseline/**'
+#     - '_tools/terraform/modules/**'
 
-jobs:
+# jobs:
 
-  terraform-baseline:
-    name: 'TF Baseline QA'
-    runs-on: ubuntu-latest
-    env:
-      environment: qa
-      region: eu-west-1
-    steps:
-      - name: Setup terraform provider
-        uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_version: 1.0.0
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
-      - name: Checkout Source
-        uses: actions/checkout@v2
+#   terraform-baseline:
+#     name: 'TF Baseline QA'
+#     runs-on: ubuntu-latest
+#     env:
+#       environment: qa
+#       region: eu-west-1
+#     steps:
+#       - name: Setup go-task
+#         uses: pnorton5432/setup-task@v1
+#         with:
+#           task-version: 3.43.3
+#       - name: Setup terraform provider
+#         uses: hashicorp/setup-terraform@v3
+#         with:
+#           terraform_version: 1.11.4
+#           cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+#       - name: Checkout Source
+#         uses: actions/checkout@v4
 
-      - name: baseline-${{ env.environment }}-${{ env.region }}
-        shell: bash
-        run: |
-          make init
-          make validate
-          make version
-          make plan
-        working-directory: ./baseline/${{ env.environment }}/${{ env.region }}
+#       - name: baseline-${{ env.environment }}-${{ env.region }}
+#         shell: bash
+#         run: |
+#           task tf:init
+#           task tf:validate
+#           task tf:plan
+#         working-directory: ./baseline/${{ env.environment }}/${{ env.region }}

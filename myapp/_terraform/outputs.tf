@@ -20,5 +20,5 @@ output "agw_base_uri" {
 
 output "agw_domain_arn" {
   description = "The ARN of the domain name"
-  value = module.apigateway.domain_name_arn
+  value       = module.apigateway.domain_name_arn
 }

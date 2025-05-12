@@ -20,12 +20,12 @@ data "aws_vpc" "current" {
 data "aws_iam_policy_document" "eks_oidc_assume_role" {
   statement {
     actions = [
-      "sts:AssumeRoleWithWebIdentity"]
-    effect  = "Allow"
+    "sts:AssumeRoleWithWebIdentity"]
+    effect = "Allow"
     condition {
       test     = "StringEquals"
       variable = "${replace(data.aws_eks_cluster.current.identity[0].oidc[0].issuer, "https://", "")}:sub"
-      values   = [
+      values = [
         "system:serviceaccount:${var.k8s_namespace}:aws-alb-ingress-controller"
       ]
     }
@@ -33,7 +33,7 @@ data "aws_iam_policy_document" "eks_oidc_assume_role" {
       identifiers = [
         "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${replace(data.aws_eks_cluster.current.identity[0].oidc[0].issuer, "https://", "")}"
       ]
-      type        = "Federated"
+      type = "Federated"
     }
   }
 }
@@ -48,7 +48,7 @@ resource "aws_iam_role" "alb_ingress_controller" {
     Role        = var.role
   }
   force_detach_policies = true
-  assume_role_policy = data.aws_iam_policy_document.eks_oidc_assume_role.json
+  assume_role_policy    = data.aws_iam_policy_document.eks_oidc_assume_role.json
 }
 
 data "aws_iam_policy_document" "alb_management" {
@@ -332,17 +332,17 @@ resource "kubernetes_deployment" "alb_ingress_controller" {
     template {
       metadata {
         labels = merge(
-        {
-          "app.kubernetes.io/name"    = "aws-alb-ingress-controller"
-          "app.kubernetes.io/version" = local.aws_alb_ingress_controller_version
-        },
-        var.k8s_pod_labels
+          {
+            "app.kubernetes.io/name"    = "aws-alb-ingress-controller"
+            "app.kubernetes.io/version" = local.aws_alb_ingress_controller_version
+          },
+          var.k8s_pod_labels
         )
         annotations = merge(
-        {
-          "iam.amazonaws.com/role" = aws_iam_role.alb_ingress_controller.arn
-        },
-        var.k8s_pod_annotations
+          {
+            "iam.amazonaws.com/role" = aws_iam_role.alb_ingress_controller.arn
+          },
+          var.k8s_pod_annotations
         )
       }
 

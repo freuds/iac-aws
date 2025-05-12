@@ -8,7 +8,7 @@ This folder defines a Terraform module, which you can use in your code by adding
 
 ```hcl
 module "alb_ingress_controller" {
-  source           = "git@github.com:born2scale/terraform-aws-eks.git/modules/terraform-aws-alb-ingress"
+  source           = "git@github.com:example/terraform-aws-eks.git/modules/terraform-aws-alb-ingress"
   k8s_namespace    = "kube-system"
   env              = var.env
   providers        = {

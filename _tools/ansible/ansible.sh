@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+export PIP_DISABLE_PIP_VERSION_CHECK=1
+export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+export CRYPTOGRAPHY_DONT_BUILD_RUST=1
+
+ANSIBLE_CONFIG="${ANSIBLE_CONFIG:-./ansible.cfg}"
+export ANSIBLE_CONFIG
+
+# shellcheck disable=SC1090
+source ~/.venv/bin/activate
+
+ANSIBLE_FORCE_COLOR=1 ANSIBLE_LOAD_CALLBACK_PLUGINS=1 PYTHONUNBUFFERED=1 ansible-playbook "$@"

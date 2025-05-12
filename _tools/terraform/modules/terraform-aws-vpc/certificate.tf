@@ -1,3 +1,7 @@
+# locals {
+#   external_domain_name = var.env == "prod" ? replace(var.external_domain_name, var.env, "") : var.external_domain_name
+# }
+
 resource "aws_acm_certificate" "cert" {
   domain_name = var.external_domain_name
   subject_alternative_names = [

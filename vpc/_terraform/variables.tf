@@ -43,8 +43,11 @@ variable "one_nat_gateway_per_az" {
   description = "Define if we created one NAT GW per AZ available or not"
 }
 
+#----------------------------------
 variable "bastion_ami" {
-  default = "ami-0874dad5025ca362c"
+  description = "ID of the AMI to use for the bastion host"
+  type        = string
+  default     = "ami-0874dad5025ca362c"
 }
 
 variable "bastion_instance_type" {
@@ -87,20 +90,22 @@ variable "ssh_port" {
   default = 22
 }
 
-variable "GANDI_APIKEY" {
-  description = "Gandi API Key defined in Terraform Cloud environment."
+#-----------------------------------
+variable "PERSONAL_ACCESS_TOKEN" {
+  description = "Gandi PAT (Personal Access Token) defined in Terraform Cloud environment."
+  type        = string
 }
 
 variable "gandi_domain_name" {
-  default     = "domain.com"
+  default     = "example.com"
   type        = string
-  description = "Domain Name"
+  description = "Domain Name from Gandi"
 }
 
 variable "gandi_alias_ns" {
-  default     = "domain.com"
+  default     = "env.sub"
   type        = string
-  description = "Domain Name"
+  description = "Define subdomain for the zone"
 }
 
 variable "gandi_aws_ns" {
@@ -109,6 +114,7 @@ variable "gandi_aws_ns" {
   description = "AWS API Route53 for delegation domain"
 }
 
+#-----------------------------------
 variable "cf_certificate_enabled" {
   default     = true
   type        = bool

@@ -1,0 +1,41 @@
+version: "3"
+
+includes:
+  requirements:
+    taskfile: ./terraform.yml
+    flatten: true
+
+  init:
+    taskfile: ./init.yml
+    flatten: true
+
+  keypair:
+    taskfile: ./keypair.yml
+    flatten: true
+
+  # vagrant:
+  #   taskfile: ./vagrant.yml
+  #   flatten: true
+
+env:
+
+vars:
+  # Global variables
+  OS: '{{OS}}'
+  ARCH: '{{ARCH}}'
+
+  # Folders variables
+  ROOT_DIR: '{{.ROOT_DIR}}'
+  TOOLS_DIR: '{{.ROOT_DIR}}/_tools'
+  SCRIPTS_DIR: '{{.ROOT_DIR}}/_tools/scripts'
+
+tasks:
+  default:
+    desc: "Display all available tasks for this project"
+    cmds:
+      - task --list-all
+
+  printenv:
+    desc: "Display all environments variables"
+    cmds:
+      - env

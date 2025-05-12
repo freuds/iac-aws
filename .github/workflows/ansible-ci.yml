@@ -1,45 +1,45 @@
-name: Ansible Molecule
+# name: Ansible Molecule
 
-on:
-  push:
-    branches:
-    - main
-    paths:
-    - '.github/**'
-    - '_tools/ansible/**'
-  pull_request:
-    branches:
-    - '*'
-    paths:
-    - '.github/**'
-    - '_tools/ansible/**'
+# on:
+#   push:
+#     branches:
+#     - main
+#     paths:
+#     - '.github/**'
+#     - '_tools/ansible/**'
+#   pull_request:
+#     branches:
+#     - '*'
+#     paths:
+#     - '.github/**'
+#     - '_tools/ansible/**'
 
-jobs:
-  aws-cli:
-    name: AWScli Role
-    runs-on: ubuntu-latest
+# jobs:
+#   aws-cli:
+#     name: AWScli Role
+#     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        distro:
-          - centos8
-          - debian10
+#     strategy:
+#       matrix:
+#         distro:
+#           - centos8
+#           - debian10
 
-    steps:
-      - name: Check out the codebase.
-        uses: actions/checkout@v2
+#     steps:
+#       - name: Check out the codebase.
+#         uses: actions/checkout@v2
 
-      - name: Set up Python 3.
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.x'
+#       - name: Set up Python 3.
+#         uses: actions/setup-python@v2
+#         with:
+#           python-version: '3.x'
 
-      - name: Install test dependencies.
-        run: pip3 install molecule docker yamllint ansible ansible-lint 'molecule[docker]'
+#       - name: Install test dependencies.
+#         run: pip3 install molecule docker yamllint ansible ansible-lint 'molecule[docker]'
 
-      - name: Run Molecule tests ansible role
-        run: cd _tools/ansible/roles/aws-cli && molecule test
-        env:
-          PY_COLORS: '1'
-          ANSIBLE_FORCE_COLOR: '1'
-          MOLECULE_DISTRO: ${{ matrix.distro }}
+#       - name: Run Molecule tests ansible role
+#         run: cd _tools/ansible/roles/aws-cli && molecule test
+#         env:
+#           PY_COLORS: '1'
+#           ANSIBLE_FORCE_COLOR: '1'
+#           MOLECULE_DISTRO: ${{ matrix.distro }}

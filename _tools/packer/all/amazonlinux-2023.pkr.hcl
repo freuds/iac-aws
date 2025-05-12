@@ -1,0 +1,1 @@
+../linux/amazonlinux/amazonlinux-2023.pkr.hcl

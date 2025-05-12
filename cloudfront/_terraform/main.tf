@@ -60,7 +60,7 @@ data "aws_acm_certificate" "assets_cloudfront_certificate" {
 }
 
 resource "aws_s3_bucket" "media-bucket" {
-  bucket = "phenix-${var.env}-media"
+  bucket = "s3-${var.env}-media"
   versioning {
     enabled = true
   }
@@ -121,7 +121,7 @@ data "aws_iam_policy_document" "media_bucket_policy" {
 }
 
 resource "aws_s3_bucket" "static-bucket" {
-  bucket = "phenix-${var.env}-static"
+  bucket = "s3-${var.env}-static"
 }
 
 resource "aws_s3_bucket_policy" "static_bucket_policy" {
