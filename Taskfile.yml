@@ -1,0 +1,6 @@
+version: "3"
+
+includes:
+  global:
+    taskfile: ./_tools/taskfiles/global.yml
+    flatten: true

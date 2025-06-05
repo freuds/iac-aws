@@ -5,5 +5,5 @@ output "base_url" {
 
 output "domain_name_arn" {
   description = "The ARN of the domain name"
-  value = aws_apigatewayv2_domain_name.domain.arn
+  value       = aws_apigatewayv2_domain_name.domain.arn
 }

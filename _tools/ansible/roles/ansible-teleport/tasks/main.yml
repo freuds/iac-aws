@@ -1,0 +1,14 @@
+---
+# Setup/install tasks.
+- include_tasks: "setup-{{ ansible_os_family }}.yml"
+
+# Configure tasks.
+- include_tasks: "configure.yml"
+
+- name: Ensure Teleport has selected state and enabled on boot.
+  ansible.builtin.systemd:
+    name: "{{ teleport_service }}"
+    state: "{{ teleport_state }}"
+    enabled: "{{ teleport_enabled }}"
+  when: ansible_virtualization_type != "docker"
+

@@ -1,0 +1,11 @@
+---
+- name: Packages update
+  ansible.builtin.package:
+    name: "*"
+    state: latest
+    update_cache: yes
+
+- name: install all needed packages
+  ansible.builtin.package:
+    name: "{{ pkg_dependencies + pkg_common + pkg_specific }}"
+    state: present

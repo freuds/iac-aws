@@ -60,11 +60,11 @@ list:	## Make terraform state list
 providers:	## Make terraform state list
 	@terraform providers
 
-install:  ## Make tfenv install
-	@tfenv install $(shell cat .terraform-version)
+# install:  ## Make tfenv install
+# 	@tfenv install $(shell cat .terraform-version)
 
-use:      ## Make tfenv use
-	@tfenv use $(shell cat .terraform-version)
+# use:      ## Make tfenv use
+# 	@tfenv use $(shell cat .terraform-version)
 
 version:  ## Show terraform version
 	@terraform version

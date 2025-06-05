@@ -45,8 +45,8 @@ variable "function_name" {
 }
 
 variable "xray_enable" {
-  default = true
-  type = bool
+  default     = true
+  type        = bool
   description = "Enable or not the AWS X-Ray service for lambda"
 }
 
@@ -54,12 +54,12 @@ variable "compatible_runtimes" {
   default = {
     nodejs = [
       "nodejs12.x",
-      "nodejs14.x"]
+    "nodejs14.x"]
     python = [
       "python3.6",
       "python3.7",
-      "python3.8"]
+    "python3.8"]
   }
-  type = map(list(string))
+  type        = map(list(string))
   description = "Define the compatible library SDK"
 }

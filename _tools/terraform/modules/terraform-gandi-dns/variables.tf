@@ -1,5 +1,6 @@
-variable "gandi_apikey" {
-  description = "Gandi API Key defined in Terraform Cloud environment."
+variable "gandi_personal_access_token" {
+  description = "Gandi PAT (Personal Access Token) defined in Terraform Cloud environment."
+  type        = string
 }
 
 variable "ns_ttl" {

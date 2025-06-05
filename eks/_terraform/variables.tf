@@ -1,5 +1,7 @@
 variable "organization" {
-  default = "phenix"
+  description = "Name of the organization"
+  type        = string
+  default     = ""
 }
 
 variable "env" {}
@@ -31,7 +33,8 @@ variable "eks_nodes_disk_size" {
 }
 variable "eks_nodes_instance_types" {
   default = [
-    "t3.large"]
+    "t3.large"
+  ]
 }
 variable "eks_node_pool_max_size" {
   default = 3

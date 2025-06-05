@@ -1,45 +1,46 @@
-#     - https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets
+# name: Terraform Build
 
-name: Terraform Build
+# on:
+#   push:
+#     branches:
+#     - main
+#     paths:
+#     - '.github/**'
+#     - 'build/**'
+#     - '_tools/terraform/modules/**'
+#   pull_request:
+#     branches:
+#     - '*'
+#     paths:
+#     - '.github/**'
+#     - 'build/**'
+#     - '_tools/terraform/modules/**'
 
-on:
-  push:
-    branches:
-    - main
-    paths:
-    - '.github/**'
-    - 'build/**'
-    - '_tools/terraform/modules/**'
-  pull_request:
-    branches:
-    - '*'
-    paths:
-    - '.github/**'
-    - 'build/**'
-    - '_tools/terraform/modules/**'
+# jobs:
 
-jobs:
+#   terraform-build:
+#     name: 'TF Build QA'
+#     runs-on: ubuntu-latest
+#     env:
+#       environment: qa
+#       region: eu-west-1
+#     steps:
+#       - name: Setup go-task
+#         uses: pnorton5432/setup-task@v1
+#         with:
+#           task-version: 3.43.3
+#       - name: Setup terraform provider
+#         uses: hashicorp/setup-terraform@v3
+#         with:
+#           terraform_version: 1.11.4
+#           cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+#       - name: Checkout Source
+#         uses: actions/checkout@v4
 
-  terraform-build:
-    name: 'TF Build QA'
-    runs-on: ubuntu-latest
-    env:
-      environment: qa
-      region: eu-west-1
-    steps:
-      - name: Setup terraform provider
-        uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_version: 1.0.0
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
-      - name: Checkout Source
-        uses: actions/checkout@v2
-
-      - name: build-${{ env.environment }}-${{ env.region }}
-        shell: bash
-        run: |
-          make init
-          make validate
-          make version
-          make plan
-        working-directory: ./build/${{ env.environment }}/${{ env.region }}
+#       - name: build-${{ env.environment }}-${{ env.region }}
+#         shell: bash
+#         run: |
+#           task tf:init
+#           task tf:validate
+#           task tf:plan
+#         working-directory: ./build/${{ env.environment }}/${{ env.region }}

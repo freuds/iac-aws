@@ -1,0 +1,32 @@
+---
+# Source: https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+
+- name: Remove AWSCli package.
+  ansible.builtin.package:
+    name:
+    - awscli
+    state: absent
+
+- name: Install package dependencies.
+  ansible.builtin.package:
+    name:
+    - unzip
+    state: present
+
+- name: Download and unarchive the bundle.
+  ansible.builtin.unarchive:
+    src: '{{ awscli_base_uri }}awscli-exe-{{ ansible_system | lower }}-{{ ansible_architecture }}.zip'
+    dest: /tmp
+    remote_src: yes
+  register: awscli_download_bundle
+
+- name: Install package.
+  ansible.builtin.command: /tmp/aws/install -i /usr/local/aws-cli -b /usr/local/bin --update
+  register: awscli_installed
+  when: awscli_download_bundle.changed
+
+- name: Remove downloaded archive.
+  ansible.builtin.file:
+    path: /tmp/aws
+    state: absent
+  when: awscli_installed.changed

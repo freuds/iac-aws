@@ -9,3 +9,7 @@ output "public_subnets" {
 output "security_group_public_subnet" {
   value = aws_security_group.packer.id
 }
+
+output "aws_iam_role_arn" {
+  value = aws_iam_role.packer_build.arn
+}

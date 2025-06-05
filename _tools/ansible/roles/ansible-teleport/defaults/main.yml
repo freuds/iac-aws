@@ -1,0 +1,53 @@
+---
+
+# Teleport package state; use `present` to make sure it's installed, or `latest`
+# if you want to upgrade or switch versions using a new repo.
+teleport_packages_state: present
+teleport_packages: teleport
+teleport_repo_url: "https://rpm.releases.teleport.dev/teleport.repo"
+
+teleport_service: teleport
+teleport_state: started
+teleport_enabled: "yes"
+
+teleport_configuration_path: "/etc/teleport.yaml"
+
+teleport_nodename: "{{ ansible_fqdn }}"
+teleport_data_dir: "/var/lib/teleport"
+
+teleport_auth_token: "xxx-changeme-xxx"
+teleport_auth_servers:
+  - 127.0.0.1:3025
+
+teleport_log_path: "/var/lib/teleport/teleport.log"
+teleport_log_level: "ERROR"
+
+teleport_storage_type: "dir"
+teleport_dynamodb_continuous_backups: false
+teleport_dynamodb_auto_scaling: false
+
+teleport_auth_enabled: false
+teleport_auth_cluster_name: "main"
+teleport_auth_second_factor: "off"
+teleport_u2f_app_id: "https://localhost:3080"
+teleport_u2f_facets:
+  - https://localhost:3080
+  - https://localhost
+
+teleport_auth_listen_address: "0.0.0.0:3025"
+teleport_auth_tokens_node: []
+teleport_auth_tokens_proxy: []
+teleport_auth_tokens_auth: []
+
+teleport_session_recording: "node"
+teleport_proxy_checks_host_keys: yes
+teleport_client_idle_timeout: "never"
+
+teleport_ssh_enabled: true
+teleport_ssh_listen_address: "0.0.0.0:3022"
+teleport_ssh_labels: '{{ hostvars[inventory_hostname].group_names[0] }}'
+
+teleport_proxy_enabled: false
+teleport_proxy_listen_address: "0.0.0.0:3023"
+teleport_proxy_web_listen_address: "0.0.0.0:3080"
+teleport_proxy_tunnel_listen_address: "0.0.0.0:3024"

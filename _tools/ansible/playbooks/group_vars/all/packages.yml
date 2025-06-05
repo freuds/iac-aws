@@ -1,0 +1,6 @@
+---
+pkg_common:
+  - sysstat
+  - jq
+  - git
+  - dnsutils

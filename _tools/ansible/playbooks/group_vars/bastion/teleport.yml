@@ -1,0 +1,3 @@
+---
+teleport_auth_servers: "auth.example.com:3025"
+teleport_auth_token: "abc-xyz"

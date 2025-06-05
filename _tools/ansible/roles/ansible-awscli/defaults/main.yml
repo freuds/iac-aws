@@ -1,0 +1,2 @@
+# Define the base URI for AWScli
+awscli_base_uri: "https://awscli.amazonaws.com/"

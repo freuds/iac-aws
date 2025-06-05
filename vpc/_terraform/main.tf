@@ -11,19 +11,26 @@ module "vpc" {
   internal_domain_name   = var.internal_domain_name
   external_domain_name   = var.external_domain_name
   one_nat_gateway_per_az = var.one_nat_gateway_per_az
+
   cf_certificate_enabled = var.cf_certificate_enabled
 }
 
+#----------------------------
+# Gandi DNS
+#----------------------------
 module "gandi-dns" {
-  source            = "../../../_tools/terraform/modules/terraform-gandi-dns"
-  gandi_apikey     = var.GANDI_APIKEY
-  gandi_domain_name = var.gandi_domain_name
-  gandi_alias_ns    = var.gandi_alias_ns
-  gandi_aws_ns      = [for ns in module.vpc.public_name_servers : format("%s.", ns)]
+  source                      = "../../../_tools/terraform/modules/terraform-gandi-dns"
+  gandi_personal_access_token = var.PERSONAL_ACCESS_TOKEN
+  gandi_domain_name           = var.gandi_domain_name
+  gandi_alias_ns              = var.gandi_alias_ns
+  gandi_aws_ns                = [for ns in module.vpc.public_name_servers : format("%s.", ns)]
 }
 
+#----------------------------
+# Bastion
+#----------------------------
 # module "bastion" {
-#   source                     = "git@github.com:xxxxxxxxxxxxxx/terraform-aws-bastion.git"
+#   source                     = "git@github.com:example/terraform-aws-bastion.git"
 #   region                     = var.region
 #   env                        = var.env
 #   vpc_id                     = module.vpc.vpc_id
@@ -46,13 +53,6 @@ module "gandi-dns" {
 
 #   # vars = {
 #   #   db_script      = data.template_file.db-import.rendered
-#   #   id_phenix_pub  = var.id_phenix_pub
-#   #   id_phenix_priv = var.id_phenix_priv
-
-#   #   datadog_api_key       = var.DATADOG_API_KEY
-#   #   datadog_tag_env       = var.env
-#   #   datadog_agent_enabled = var.datadog_agent_enabled
-#   # }
 # }
 
 # data "template_file" "db-import" {

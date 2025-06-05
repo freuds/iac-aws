@@ -1,0 +1,23 @@
+# TODO
+
+- [X] Convert Makefile into go-task files
+  - [X] Implement all terraform commands
+  - [ ] Implement all helm commands
+  - [ ] Implement all packer commands
+- [X] Refacto service baseline
+- [X] Refacto service build
+- [X] Refacto service vpc
+- [ ] Refacto service lambda
+- [X] Terraform module gandi-dns
+- [ ] Secure (SSH) instances : modify SG, ssh_port, and packer build
+- [ ] Implement boundary
+- [ ] EKS evolutions
+  - [ ] Set karpenter plugin
+  - [ ] Set auto-mode nodes
+  - [ ] : terraform module for nodes group
+- [X] : bastion
+  - [X] rewrite role_policy
+  - [X] : bastion module : fix ipaddress re-assign
+  - [ ] : bastion module : add KMS encryption
+- [X] : terraform lambda + apigateway inside VPC
+  - [ ] : lambda layer nodejs

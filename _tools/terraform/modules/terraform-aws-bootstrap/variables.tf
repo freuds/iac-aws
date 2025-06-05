@@ -26,9 +26,9 @@ variable "accounts" {
   type = map(string)
 
   default = {
-    "prod"    = "devops-prod@wearephenix.com"
-    "staging" = "devops-staging@wearephenix.com"
-    "qa"      = "devops-qa@wearephenix.com"
+    "prod"    = "devops-prod@example.com"
+    "staging" = "devops-staging@example.com"
+    "qa"      = "devops-qa@example.com"
   }
 }
 

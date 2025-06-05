@@ -4,12 +4,12 @@
 resource "aws_apigatewayv2_api" "api" {
   name          = format("apigw-%s-%s", var.env, var.service)
   protocol_type = var.protocol_type
-  description = var.api_description
+  description   = var.api_description
 
   disable_execute_api_endpoint = var.disable_execute_api_endpoint
 
   cors_configuration {
-    allow_methods = ["OPTIONS","POST","GET"]
+    allow_methods = ["OPTIONS", "POST", "GET"]
     allow_origins = ["*"]
     allow_headers = ["Content-Type,Authorization"]
   }
@@ -49,7 +49,7 @@ resource "aws_apigatewayv2_stage" "stage" {
   }
 
   default_route_settings {
-    logging_level = var.logging_level
+    logging_level            = var.logging_level
     detailed_metrics_enabled = var.detailed_metrics_enabled
   }
 
@@ -64,7 +64,7 @@ resource "aws_apigatewayv2_stage" "stage" {
 // API integration
 //---------------------
 resource "aws_apigatewayv2_integration" "integration" {
-  api_id = aws_apigatewayv2_api.api.id
+  api_id             = aws_apigatewayv2_api.api.id
   integration_uri    = var.integration_uri
   integration_type   = "AWS_PROXY"
   integration_method = "POST"

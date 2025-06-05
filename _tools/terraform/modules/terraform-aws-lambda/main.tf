@@ -105,28 +105,28 @@ locals {
 }
 
 data "archive_file" "xray-sdk-layer" {
-  count      = var.xray_enable ? 1 : 0
-  type = "zip"
+  count       = var.xray_enable ? 1 : 0
+  type        = "zip"
   source_dir  = "../../../lambdas/${local.sdk_layer_name}"
   output_path = "../../../lambdas/${local.sdk_layer_name}.zip"
 }
 
 resource "aws_s3_bucket_object" "xray-sdk-layer" {
-  count      = var.xray_enable ? 1 : 0
+  count  = var.xray_enable ? 1 : 0
   bucket = aws_s3_bucket.lambda_bucket.id
   key    = "${local.sdk_layer_name}.zip"
   source = data.archive_file.xray-sdk-layer[0].output_path
-  etag = filemd5(data.archive_file.xray-sdk-layer[0].output_path)
+  etag   = filemd5(data.archive_file.xray-sdk-layer[0].output_path)
 }
 
 resource "aws_lambda_layer_version" "xray-sdk-layer" {
-  count      = var.xray_enable ? 1 : 0
-  filename   = "../../../lambdas/${local.sdk_layer_name}.zip"
-  layer_name = format("%s-layer", local.sdk_layer_name)
+  count               = var.xray_enable ? 1 : 0
+  filename            = "../../../lambdas/${local.sdk_layer_name}.zip"
+  layer_name          = format("%s-layer", local.sdk_layer_name)
   compatible_runtimes = toset(lookup(var.compatible_runtimes, var.layer_type_lib))
-  description = var.layer_description
-  license_info = var.license_info
-  source_code_hash = data.archive_file.xray-sdk-layer[0].output_base64sha256
+  description         = var.layer_description
+  license_info        = var.license_info
+  source_code_hash    = data.archive_file.xray-sdk-layer[0].output_base64sha256
 }
 
 

@@ -1,6 +1,6 @@
-####################################
+#----------------------------------
 # VPC
-####################################
+#----------------------------------
 resource "aws_vpc" "main" {
   cidr_block           = var.cidr_block
   enable_dns_hostnames = "true"
@@ -11,9 +11,9 @@ resource "aws_vpc" "main" {
   }
 }
 
-####################################
+#----------------------------------
 # Public subnets
-####################################
+#----------------------------------
 resource "aws_subnet" "public" {
   for_each                = toset(lookup(var.azs, var.region))
   vpc_id                  = aws_vpc.main.id
@@ -29,9 +29,9 @@ resource "aws_subnet" "public" {
   )
 }
 
-####################################
+#----------------------------------
 # Ressources for Publics subnets
-####################################
+#----------------------------------
 resource "aws_internet_gateway" "gw" {
   vpc_id = aws_vpc.main.id
 
@@ -62,16 +62,16 @@ resource "aws_route_table_association" "rta-pub" {
   route_table_id = aws_route_table.public.id
 }
 
-####################################
+#----------------------------------
 # Zone Public Route53
-####################################
+#----------------------------------
 resource "aws_route53_zone" "public" {
   name = var.external_domain_name
 }
 
-####################################
+#----------------------------------
 # Single-NAT-GW : EIP
-####################################
+#----------------------------------
 resource "aws_eip" "single-eip" {
   count = !var.one_nat_gateway_per_az ? 1 : 0
   tags = {
@@ -80,9 +80,9 @@ resource "aws_eip" "single-eip" {
   }
 }
 
-####################################
+#----------------------------------
 # Single-NAT-GW :
-####################################
+#----------------------------------
 resource "aws_nat_gateway" "single-natgw" {
   count         = !var.one_nat_gateway_per_az ? 1 : 0
   allocation_id = aws_eip.single-eip[count.index].id
@@ -93,9 +93,9 @@ resource "aws_nat_gateway" "single-natgw" {
   }
 }
 
-####################################
+#----------------------------------
 # Single-NAT-GW : Record DNS
-####################################
+#----------------------------------
 resource "aws_route53_record" "single-natgw-record" {
   count   = !var.one_nat_gateway_per_az ? 1 : 0
   zone_id = aws_route53_zone.public.id
@@ -107,9 +107,9 @@ resource "aws_route53_record" "single-natgw-record" {
   ]
 }
 
-####################################
+#----------------------------------
 # Multi-NAT-GW : EIP
-####################################
+#----------------------------------
 resource "aws_eip" "multi-eip" {
   for_each = var.one_nat_gateway_per_az ? toset(lookup(var.azs, var.region)) : []
   tags = {
@@ -118,9 +118,9 @@ resource "aws_eip" "multi-eip" {
   }
 }
 
-####################################
+#----------------------------------
 # Multi-NAT-GW :
-####################################
+#----------------------------------
 resource "aws_nat_gateway" "multi-natgw" {
 
   for_each      = var.one_nat_gateway_per_az ? toset(lookup(var.azs, var.region)) : []
@@ -137,9 +137,9 @@ resource "aws_nat_gateway" "multi-natgw" {
   }
 }
 
-####################################
+#----------------------------------
 # Multi-NAT-GW : records public
-####################################
+#----------------------------------
 resource "aws_route53_record" "multi-natgw-record" {
 
   for_each = var.one_nat_gateway_per_az ? toset(lookup(var.azs, var.region)) : []
@@ -152,9 +152,9 @@ resource "aws_route53_record" "multi-natgw-record" {
   ]
 }
 
-####################################
+#----------------------------------
 # Private subnets
-####################################
+#----------------------------------
 resource "aws_subnet" "private" {
   for_each                = toset(lookup(var.azs, var.region))
   vpc_id                  = aws_vpc.main.id
@@ -170,9 +170,9 @@ resource "aws_subnet" "private" {
   )
 }
 
-####################################
+#----------------------------------
 # Private route table
-####################################
+#----------------------------------
 resource "aws_route_table" "private" {
   for_each = toset(lookup(var.azs, var.region))
   vpc_id   = aws_vpc.main.id
@@ -182,18 +182,18 @@ resource "aws_route_table" "private" {
     Environment = var.env
   }
 }
-####################################
+#----------------------------------
 # Private route table association
-####################################
+#----------------------------------
 resource "aws_route_table_association" "rta-prv" {
   for_each       = toset(lookup(var.azs, var.region))
   subnet_id      = element([for o in aws_subnet.private : o.id], index(lookup(var.azs, var.region), each.key))
   route_table_id = aws_route_table.private[each.value].id
 }
 
-####################################
+#----------------------------------
 # Private route
-####################################
+#----------------------------------
 resource "aws_route" "private-default" {
   for_each               = toset(lookup(var.azs, var.region))
   route_table_id         = aws_route_table.private[each.value].id
@@ -205,84 +205,6 @@ resource "aws_route53_zone" "private" {
   name = var.internal_domain_name
   vpc {
     vpc_id = aws_vpc.main.id
-  }
-}
-
-####################################
-# VPC Endpoints
-####################################
-resource "aws_vpc_endpoint" "s3" {
-  count        = var.s3_endpoint_enabled ? 1 : 0
-  vpc_id       = aws_vpc.main.id
-  service_name = "com.amazonaws.${var.region}.s3"
-  route_table_ids = concat([
-  aws_route_table.public.id], [for o in aws_route_table.private : o.id])
-  tags = {
-    Environment = var.env,
-    Service     = "S3",
-    Stack       = "common",
-    Role        = "endpoint"
-  }
-}
-
-resource "aws_vpc_endpoint" "dynamodb" {
-  count        = var.dynamodb_endpoint_enabled ? 1 : 0
-  vpc_id       = aws_vpc.main.id
-  service_name = "com.amazonaws.${var.region}.dynamodb"
-  route_table_ids = concat([
-  aws_route_table.public.id], [for o in aws_route_table.private : o.id])
-  tags = {
-    Environment = var.env,
-    Service     = "DynamoDB",
-    Stack       = "common",
-    Role        = "endpoint"
-  }
-}
-
-resource "aws_vpc_endpoint" "lambda" {
-  count               = var.lambda_endpoint_enabled ? 1 : 0
-  vpc_id              = aws_vpc.main.id
-  service_name        = "com.amazonaws.${var.region}.lambda"
-  vpc_endpoint_type   = "Interface"
-  private_dns_enabled = true
-  security_group_ids = [
-    aws_security_group.allow-lambda.id,
-  ]
-  subnet_ids = [for o in aws_subnet.private : o.id]
-
-  tags = {
-    Environment = var.env,
-    Service     = "Lambda",
-    Stack       = "common",
-    Role        = "endpoint"
-  }
-}
-
-//----------------------------
-# SG bastion ssh egress
-//----------------------------
-resource "aws_security_group" "allow-lambda" {
-  name        = "sgp-allow-lambda"
-  vpc_id      = aws_vpc.main.id
-  description = "Security group for lambda interface VPC"
-  ingress {
-    from_port   = var.inbound_port
-    to_port     = var.inbound_port
-    protocol    = "-1"
-    cidr_blocks = var.inbound_cidr_blocks
-  }
-  egress {
-    from_port   = var.outbound_port
-    to_port     = var.outbound_port
-    protocol    = "-1"
-    cidr_blocks = var.outbound_cidr_blocks
-  }
-  tags = {
-    Name        = "sgp-allow-lambda",
-    Environment = var.env
-  }
-  lifecycle {
-    create_before_destroy = true
   }
 }
 
